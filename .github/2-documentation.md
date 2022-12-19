@@ -1,9 +1,9 @@
 ---
 name: "Documentation"
-about: Updating documentation
+about: "Updating documentation"
 title: ""
-labels: 'Type: Documentation'
-assignees: ''
+labels: "Type: Documentation"
+assignees: ""
 
 ---
 <!-- These comments automatically delete -->

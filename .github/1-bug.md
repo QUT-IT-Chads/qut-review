@@ -1,9 +1,9 @@
 ---
 name: "Bug Report"
-about: Create a report to help us improve the application
+about: "Create a report to help us improve the application"
 title: ""
-labels: 'Type: Bug'
-assignees: ''
+labels: "Type: Bug"
+assignees: ""
 
 ---
 <!-- These comments automatically delete -->
@@ -14,7 +14,9 @@ Cc:
 <!-- A clear and concise description of what the bug is. -->
 
 ### To Reproduce
+
 Steps to reproduce the behavior:
+
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
@@ -24,6 +26,7 @@ Steps to reproduce the behavior:
 <!-- A clear and concise description of what you expected to happen. -->
 
 ### Tasks
+
 - [ ] Investigate
 - [ ] Fix
 
@@ -31,9 +34,10 @@ Steps to reproduce the behavior:
 <!-- Add any other context about the problem here. -->
 
 ### Environment
- - Device: [e.g. iPhone 12]
- - Browser: [e.g. chrome, safari]
- - OS: [e.g. iOS]
+
+- Device: [e.g. iPhone 12]
+- Browser: [e.g. chrome, safari]
+- OS: [e.g. iOS]
 
 ### Screenshots
 <!-- If applicable, add screenshots to help explain your problem. -->
