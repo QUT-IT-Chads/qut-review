@@ -1,9 +1,9 @@
 ---
 name: "Refactor"
-about: 'Something that needs improving while not changing the functionality
+about: "Something that needs improving while not changing the functionality"
 title: ""
-labels: 'Type: Refactor'
-assignees: ''
+labels: "Type: Refactor"
+assignees: ""
 
 ---
 <!-- These comments automatically delete -->
