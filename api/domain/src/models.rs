@@ -32,7 +32,7 @@ impl TeachingPeriod {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub enum Semester {
-    Normal(u8),
+    Standard(u8),
     Summer,
     Other,
 }

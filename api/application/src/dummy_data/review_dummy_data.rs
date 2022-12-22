@@ -9,7 +9,7 @@ pub fn get_review() -> Review {
         true, 
         TeachingPeriod::new_dummy(
             2022, 
-            Semester::Normal(4)
+            Semester::Standard(2)
         ),
         DateTime::<Utc>::default(),    
         DateTime::<Utc>::default(),    
