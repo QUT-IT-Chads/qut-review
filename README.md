@@ -18,7 +18,7 @@ A website for students to submit reviews for QUT units.
 5. Install all required dependencies: `yarn install`
 6. Run the server:
     - via build: `yarn build && yarn serve`
-    - via development: `yarn develop`
+    - via development: `yarn dev`
 
 ## Backend
 
