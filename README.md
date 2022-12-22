@@ -2,39 +2,37 @@
 
 A website for students to submit reviews for QUT units.
 
-# Getting Started
+## Tools Used
 
-## Frontend
+- [node.js](https://nodejs.org/en/): JavaScript runtime environment
+- [yarn](https://yarnpkg.com/): Package manager for node.js
+- [Husky](https://typicode.github.io/husky/): Git hooks made easy
+- [Commitlint](https://commitlint.js.org/): Linting for commit messages
 
-### Required Tools
-- [NodeJs](https://nodejs.org/en/)
-- [Yarn](https://yarnpkg.com/)
+## Installation
 
-### Steps
-1. Open a terminal and navigate into the root project directory `/`
-2. Install all required dependencies: `yarn install`
-3. Configure [Husky](): `yarn run prepare`
-4. Navigate into the `client` directory: `cd client/`
-5. Install all required dependencies: `yarn install`
-6. Run the server:
-    - via build: `yarn build && yarn serve`
-    - via development: `yarn dev`
+1. Install **npm** from [node.js](https://nodejs.org/en/download/).
+2. Install **yarn** globally using: `npm install -g yarn`.
+3. Navigate to the project root directory and install all required dependencies with: `yarn install`.
+4. Prepare [Husky](https://typicode.github.io/husky/) with: `yarn run prepare`.
+   This allows Husky to run the scripts defined in `.husky/` on every commit.
 
-## Backend
+### Commit Conventions
 
-### Required Tools
-- [Cargo](https://github.com/rust-lang/cargo) (Rustlang build tool)
+This project uses [commitlint](https://commitlint.js.org/) to enforce commit message conventions. Commit messages should take the following form:
 
-### Steps:
-1. Open a terminal
-2. Navigate into the `/api` directory: `cd api/`
-3. Run the api project: `cargo run`
+```bash
+git commit -m "<type>(<scope>): <description>"
+```
 
-# Contribution
-**Note:** The project is currently being developed by a small team and won't be accepting any PR's until further in it's life. The dot points below however, still remain true regardless of that fact.
+The supported types and scopes can be found in [commitlint.config.js](commitlint.config.js). For more information see [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#summary).
 
-~~This project is open source and can be supported through a variety of ways, such as:~~
+## Contribution
+
+**Note:** The project is currently being developed by a small team and won't be accepting any feature PRs, however the following is still recommended:
+
+<!-- ~~This project is open source and can be supported through a variety of ways, such as:~~ -->
 - Creating issues and subsequent pull-requests if you encounter any problems
-- Starring the project on Github
-- Sharing the site with your friends and peers
-- Running the website unfortunately occurs costs. If you feel like this project has provided value to you, please consider donating via __ (Donation link not setup yet)
+- Starring the project on GitHub
+- Sharing the website with your friends and peers
+- Web hosting infrastructure incurs costs so if you feel like this project has been of value to you, please consider donating. (The donation link will be setup soon)
