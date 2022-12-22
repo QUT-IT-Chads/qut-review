@@ -19,6 +19,16 @@ module.exports = {
                 'test', // Adding missing tests or correcting existing tests
             ],
         ],
+        'scope-enum': [
+            2,
+            'always',
+            [
+                'all', // Changes made everywhere
+                'root', // Changes made in root/ directory
+                'client', // Changes made in client/ directory
+                'api' // Changes made in api/ directory
+            ]
+        ]
     },
     helpUrl: "https://github.com/conventional-changelog/commitlint/#what-is-commitlint"
 };
