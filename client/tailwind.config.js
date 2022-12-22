@@ -6,8 +6,8 @@ module.exports = {
             'light-gray': '#5b6778',
             'light-blue': '#3287fd',
             'dark-blue': '#245aac',
-            'yellow': '#ffdd29',
-        },
+            yellow: '#ffdd29'
+        }
     },
     content: [
         './app/**/*.{js,ts,jsx,tsx}',
