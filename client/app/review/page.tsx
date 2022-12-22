@@ -1,7 +1,8 @@
 const Review = () => {
     return (
         <div>
-            <h1>Hello World</h1>
+            <section className={'section-statistics'}></section>
+            <section className={'section-reviews'}></section>
         </div>
     );
 };
