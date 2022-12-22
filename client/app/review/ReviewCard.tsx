@@ -1,5 +1,5 @@
 import React from 'react';
-import { Review } from '../../types/review/types';
+import Review from '../../types/review/types';
 
 interface reviewProps {
     review: Review;
@@ -21,7 +21,9 @@ const ReviewCard = (props: reviewProps) => {
                     {reviewBody}
                 </div>
 
-                <span className="text-end text-sm">{lastUpdated}</span>
+                <span className="text-end text-sm">
+                    last updated {lastUpdated.toLocaleDateString()}
+                </span>
             </div>
         </div>
     );
