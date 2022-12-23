@@ -52,6 +52,7 @@ version = "0.1.0"
 dependencies = [
  "application",
  "domain",
+ "dotenvy",
  "rocket",
  "serde_json",
  "shared",
@@ -61,7 +62,6 @@ dependencies = [
 name = "application"
 version = "0.1.0"
 dependencies = [
- "chrono",
  "diesel",
  "domain",
  "infrastructure",
@@ -397,6 +397,12 @@ dependencies = [
  "rocket",
  "serde",
 ]
+
+[[package]]
+name = "dotenvy"
+version = "0.15.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "03d8c417d7a8cb362e0c37e5d815f5eb7c37f79ff93707329d5a194e42e54ca0"
 
 [[package]]
 name = "either"
@@ -1315,6 +1321,7 @@ dependencies = [
 name = "shared"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "domain",
  "rocket",
  "serde",
