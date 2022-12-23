@@ -1,4 +1,4 @@
-interface Recent {
+export interface Recent {
     unitCode: string;
     unitName: string;
     unitDescription: string;
