@@ -1,5 +1,6 @@
 use crate::dummy_data::review_dummy_data;
 use domain::models::review::Review;
+use regex::Regex;
 use rocket::serde::Serialize;
 use rocket::{
     http::{uri::Path, RawStr},
@@ -43,25 +44,33 @@ pub struct DummyResponse {
 
 impl DummyResponse {
     pub fn return_dummy(url: Path) -> Option<ResponseBody> {
-        let url = url.split('/').skip(1).collect::<Vec<&RawStr>>();
+        let url_split = url.split('/').skip(1).collect::<Vec<&RawStr>>();
 
-        match url[1].as_str() {
+        match url_split[1].as_str() {
             "review" => {
-                // Todo: use regex here
+                match url.as_str() {
+                    "/api/review/create" => {
+                        return Some(ResponseBody::Review(review_dummy_data::get_review()));
+                    }
+                    _ => {
+                        let re = Regex::new(r"api/(?:(review/\d+))$").unwrap();
+                        let regex_matched = re.is_match(url.as_str());
 
-                // /api/review/
-                if url.len() == 2 {
-                    return Some(ResponseBody::Reviews(review_dummy_data::get_reviews()));
-                }
+                        // /api/review/<id>
+                        if regex_matched {
+                            return Some(ResponseBody::Review(review_dummy_data::get_review()));
+                        }
 
-                // /api/review/<id>
-                if url.len() == 3 {
-                    return Some(ResponseBody::Review(review_dummy_data::get_review()));
+                        // /api/review
+                        if url == "/api/review" {
+                            return Some(ResponseBody::Reviews(review_dummy_data::get_reviews()));
+                        }
+
+                        return None;
+                    }
                 }
             }
             _ => return None,
         }
-
-        None
     }
 }

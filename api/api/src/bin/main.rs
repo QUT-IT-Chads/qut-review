@@ -10,5 +10,6 @@ fn rocket() -> _ {
         .mount("/api/review", routes![
             review_handler::list_reviews_handler, 
             review_handler::list_review_handler,
+            review_handler::create_review_handler,
         ])
 }

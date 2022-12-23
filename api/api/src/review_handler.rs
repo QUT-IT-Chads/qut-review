@@ -1,7 +1,8 @@
-use application::review::read;
-use domain::models::review::Review;
-use rocket::get;
-use rocket::response::status::NotFound;
+use application::review::{create, read};
+use domain::models::review::{NewReview, Review};
+use rocket::response::status::{Created, NotFound};
+use rocket::serde::json::Json;
+use rocket::{get, post};
 use shared::response_models::{DummyResponse, NetworkResponse, Response, ResponseBody};
 
 /// Returns a JSON serialized vector of all reviews
@@ -27,9 +28,7 @@ pub fn list_review_handler(
     demo_mode: Result<DummyResponse, NetworkResponse>,
 ) -> Result<String, NotFound<String>> {
     if let Ok(dummy_data) = demo_mode {
-        return Ok(
-            serde_json::to_string(&dummy_data).expect("Return 500 internal server error.")
-        );
+        return Ok(serde_json::to_string(&dummy_data).expect("Return 500 internal server error."));
     }
 
     let review: Review = read::list_review(review_id)?;
@@ -38,4 +37,18 @@ pub fn list_review_handler(
     };
 
     Ok(serde_json::to_string(&response).expect("Return 500 internal server error."))
+}
+
+#[post("/create", format = "application/json", data = "<review>")]
+pub fn create_review_handler(
+    review: Json<NewReview>,
+    demo_mode: Result<DummyResponse, NetworkResponse>,
+) -> Created<String> {
+    if let Ok(dummy_data) = demo_mode {
+        return Created::new("").tagged_body(
+            serde_json::to_string(&dummy_data).expect("Return 500 internal server error."),
+        );
+    }
+
+    create::create_review(review)
 }
