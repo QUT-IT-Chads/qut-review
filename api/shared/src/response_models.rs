@@ -14,7 +14,9 @@ pub enum NetworkResponse {
     BadRequest(String),
     #[response(status = 404)]
     NotFound(String),
-    DemoMode(String),
+
+    NotInDemoMode(String),
+    NoDemoData(String),
 }
 
 #[derive(Debug, Serialize)]
@@ -33,7 +35,8 @@ pub struct Response {
     pub body: ResponseBody,
 }
 
-#[derive(Debug)]
+#[derive(Serialize)]
+#[serde(crate = "rocket::serde")]
 pub struct DummyResponse {
     pub body: ResponseBody,
 }
@@ -44,6 +47,8 @@ impl DummyResponse {
 
         match url[1].as_str() {
             "review" => {
+                // Todo: use regex here
+
                 // /api/review/
                 if url.len() == 2 {
                     return Some(ResponseBody::Reviews(review_dummy_data::get_reviews()));

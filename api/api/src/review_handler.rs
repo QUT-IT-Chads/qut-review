@@ -8,7 +8,7 @@ use shared::response_models::{DummyResponse, NetworkResponse, Response, Response
 #[get("/")]
 pub fn list_reviews_handler(demo_mode: Result<DummyResponse, NetworkResponse>) -> String {
     if let Ok(dummy_data) = demo_mode {
-        return serde_json::to_string(&dummy_data.body).expect("Return 500 internal server error.");
+        return serde_json::to_string(&dummy_data).expect("Return 500 internal server error.");
     }
 
     let reviews: Vec<Review> = read::list_reviews();
@@ -28,7 +28,7 @@ pub fn list_review_handler(
 ) -> Result<String, NotFound<String>> {
     if let Ok(dummy_data) = demo_mode {
         return Ok(
-            serde_json::to_string(&dummy_data.body).expect("Return 500 internal server error.")
+            serde_json::to_string(&dummy_data).expect("Return 500 internal server error.")
         );
     }
 
