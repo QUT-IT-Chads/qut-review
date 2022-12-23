@@ -22,7 +22,7 @@ impl<'r> FromRequest<'r> for DummyResponse {
                 None => {
                     return Outcome::Failure((
                         Status::NotFound,
-                        NetworkResponse::NoDemoData(String::from("not demo mode")),
+                        NetworkResponse::NoDemoData(String::from("no demo data")),
                     ))
                 }
             };

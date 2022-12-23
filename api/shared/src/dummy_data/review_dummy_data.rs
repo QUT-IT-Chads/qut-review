@@ -6,7 +6,7 @@ fn create_dummy_review(unit_code: String, unit_name: String, rating: u8) -> Revi
     Review {
         id: 1, 
         unit: Unit::new_dummy(unit_code, unit_name, String::new()), 
-        rating: 3, 
+        rating, 
         passed_unit: true, 
         review_body: String::new(),
         teaching_period: TeachingPeriod::new_dummy(
@@ -17,7 +17,6 @@ fn create_dummy_review(unit_code: String, unit_name: String, rating: u8) -> Revi
         last_updated: DateTime::<Utc>::default(),    
         approved: true,
         grade_achieved: None,
-        user: (),
     }
 }
 

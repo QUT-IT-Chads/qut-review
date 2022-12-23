@@ -16,8 +16,6 @@ pub struct Review {
     /// Approval by admin - Review should not be visible until approved
     pub approved: bool,
     pub grade_achieved: Option<Grade>,
-    // Todo
-    pub user: (),
 }
 
 impl Review {
@@ -34,13 +32,22 @@ impl Review {
             last_updated: DateTime::<Utc>::default(),
             approved: false,
             grade_achieved: new_review.grade_achieved,
-            user: (),
         }
     }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct NewReview {
+    unit: Unit,
+    rating: u8,
+    passed_unit: bool,
+    review_body: String,
+    teaching_period: TeachingPeriod,
+    grade_achieved: Option<Grade>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct UpdateReview {
     unit: Unit,
     rating: u8,
     passed_unit: bool,

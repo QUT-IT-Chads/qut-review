@@ -49,7 +49,7 @@ impl DummyResponse {
         match url_split[1].as_str() {
             "review" => {
                 match url.as_str() {
-                    "/api/review/create" => {
+                    "/api/review/create" | "api/review/update" | "api/review/approve" => {
                         return Some(ResponseBody::Review(review_dummy_data::get_review()));
                     }
                     _ => {
@@ -57,6 +57,14 @@ impl DummyResponse {
                         let regex_matched = re.is_match(url.as_str());
 
                         // /api/review/<id>
+                        if regex_matched {
+                            return Some(ResponseBody::Review(review_dummy_data::get_review()));
+                        }
+
+                        let re = Regex::new(r"api/(?:(review/approve/\d+))$").unwrap();
+                        let regex_matched = re.is_match(url.as_str());
+
+                        // /api/review/approve/<id>
                         if regex_matched {
                             return Some(ResponseBody::Review(review_dummy_data::get_review()));
                         }
