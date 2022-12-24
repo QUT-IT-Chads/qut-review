@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Unit {
     unit_code: String,
     unit_name: String,
@@ -8,7 +8,7 @@ pub struct Unit {
 }
 
 impl Unit {
-    pub fn new_dummy(unit_code: String, unit_name: String, unit_description: String) -> Unit {
+    pub fn new(unit_code: String, unit_name: String, unit_description: String) -> Unit {
         Unit {
             unit_code,
             unit_name,

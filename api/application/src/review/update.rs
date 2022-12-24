@@ -1,4 +1,4 @@
-use domain::models::review::UpdateReview;
+use domain::models::review::NewReview;
 use rocket::response::status::{Created, NotFound};
 use rocket::serde::json::Json;
 use shared::response_models::{Response, ResponseBody};
@@ -15,7 +15,7 @@ pub fn approve_review(review_id: u32, status: bool) -> Result<Created<String>, N
 
 pub fn update_review(
     review_id: u32,
-    review: Json<UpdateReview>,
+    review: Json<NewReview>,
 ) -> Result<Created<String>, NotFound<String>> {
     let review = review.into_inner();
 
