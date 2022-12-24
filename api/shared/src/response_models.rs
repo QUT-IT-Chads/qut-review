@@ -53,18 +53,10 @@ impl DummyResponse {
                         return Some(ResponseBody::Review(review_dummy_data::get_review()));
                     }
                     _ => {
-                        let re = Regex::new(r"api/(?:(review/\d+))$").unwrap();
+                        let re = Regex::new(r"api/(?:(review/\d+|review/approve/\d+))$").unwrap();
                         let regex_matched = re.is_match(url.as_str());
 
-                        // /api/review/<id>
-                        if regex_matched {
-                            return Some(ResponseBody::Review(review_dummy_data::get_review()));
-                        }
-
-                        let re = Regex::new(r"api/(?:(review/approve/\d+))$").unwrap();
-                        let regex_matched = re.is_match(url.as_str());
-
-                        // /api/review/approve/<id>
+                        // /api/review/<id> | /api/review/approve/<id>
                         if regex_matched {
                             return Some(ResponseBody::Review(review_dummy_data::get_review()));
                         }

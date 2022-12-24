@@ -1,11 +1,11 @@
 use application::review::{create, delete, read, update};
-use domain::models::review::{NewReview, Review, UpdateReview};
+use domain::models::review::{NewReview, Review};
 use rocket::response::status::{Created, NotFound};
 use rocket::serde::json::Json;
 use rocket::{delete, get, post, put};
 use shared::response_models::{DummyResponse, NetworkResponse, Response, ResponseBody};
 
-/// Returns a JSON serialized vector of all reviews
+/// Returns a 200 OK containing JSON vector of all reviews
 #[get("/")]
 pub fn list_reviews_handler(demo_mode: Result<DummyResponse, NetworkResponse>) -> String {
     if let Ok(dummy_data) = demo_mode {
@@ -20,8 +20,8 @@ pub fn list_reviews_handler(demo_mode: Result<DummyResponse, NetworkResponse>) -
     serde_json::to_string(&response).expect("Return 500 internal server error.")
 }
 
-/// Takes in a `review_id` and returns the associated review as a JSON serialized review
-/// otherwise, a NotFound NetworkResponse.
+/// Takes in a `review_id` and returns a 200 OK with the associated review as JSON
+/// otherwise, a 404 NotFound NetworkResponse.
 #[get("/<review_id>")]
 pub fn list_review_handler(
     review_id: u32,
@@ -39,6 +39,7 @@ pub fn list_review_handler(
     Ok(serde_json::to_string(&response).expect("Return 500 internal server error."))
 }
 
+/// Takes in a `NewReview` and returns a 201 Created with the created review as JSON
 #[post("/create", format = "application/json", data = "<review>")]
 pub fn create_review_handler(
     review: Json<NewReview>,
@@ -53,6 +54,10 @@ pub fn create_review_handler(
     create::create_review(review)
 }
 
+/// Takes in a `review_id` and an approved `status` bool returning a 201 Created with the
+/// associated review as JSON otherwise, a 404 NotFound NetworkResponse.
+///
+/// If no `status` is provided, it will default to `true`
 #[put("/approve/<review_id>?<status>")]
 pub fn approve_review_handler(
     review_id: u32,
@@ -68,6 +73,8 @@ pub fn approve_review_handler(
     update::approve_review(review_id, status.unwrap_or(true))
 }
 
+/// Takes in a `review_id` and returns a 200 OK
+/// otherwise, a 404 NotFound NetworkResponse
 #[delete("/<review_id>")]
 pub fn delete_review_handler(
     review_id: u32,
@@ -79,10 +86,12 @@ pub fn delete_review_handler(
     delete::delete_review(review_id)
 }
 
+/// Takes in a `review_id` and `NewReview` object returning a 201 Created with the updated review as JSON
+/// otherwise, a 404 NotFound NetworkResponse
 #[post("/<review_id>", format = "application/json", data = "<review>")]
 pub fn update_review_handler(
     review_id: u32,
-    review: Json<UpdateReview>,
+    review: Json<NewReview>,
     demo_mode: Result<DummyResponse, NetworkResponse>,
 ) -> Result<Created<String>, NotFound<String>> {
     if let Ok(dummy_data) = demo_mode {

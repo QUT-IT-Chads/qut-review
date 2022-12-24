@@ -1,6 +1,6 @@
-use crate::enums::grade::Grade;
-use crate::models::{teaching_period::TeachingPeriod, unit::Unit};
+use crate::{enums::semester::Semester, models::unit::Unit};
 use chrono::{DateTime, Utc};
+use uuid::Uuid;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -10,17 +10,20 @@ pub struct Review {
     pub rating: u8,
     pub passed_unit: bool,
     pub review_body: String,
-    pub teaching_period: TeachingPeriod,
+    pub teaching_period: Semester,
     pub date_published: DateTime<Utc>,
     pub last_updated: DateTime<Utc>,
     /// Approval by admin - Review should not be visible until approved
     pub approved: bool,
-    pub grade_achieved: Option<Grade>,
+    pub grade_achieved: Option<u8>,
+    pub user_id: Uuid,
 }
 
 impl Review {
     /// !Warning: This should only be called when creating dummy data.
     pub fn new(new_review: NewReview) -> Review {
+        let uuid = Uuid::new_v4();
+
         Review {
             id: 1,
             unit: new_review.unit,
@@ -32,6 +35,7 @@ impl Review {
             last_updated: DateTime::<Utc>::default(),
             approved: false,
             grade_achieved: new_review.grade_achieved,
+            user_id: uuid,
         }
     }
 }
@@ -42,16 +46,6 @@ pub struct NewReview {
     rating: u8,
     passed_unit: bool,
     review_body: String,
-    teaching_period: TeachingPeriod,
-    grade_achieved: Option<Grade>,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct UpdateReview {
-    unit: Unit,
-    rating: u8,
-    passed_unit: bool,
-    review_body: String,
-    teaching_period: TeachingPeriod,
-    grade_achieved: Option<Grade>,
+    teaching_period: Semester,
+    grade_achieved: Option<u8>,
 }

@@ -8,7 +8,15 @@ edition = "2021"
 [dependencies]
 domain = { path = "../domain" }
 
-rocket = { version = "0.5.0-rc.2", features = ["json"] }
+rocket = { version = "0.5.0-rc.2", features = ["json", "uuid"] }
 serde = { version = "1.0.147", features = ["derive"] }
 chrono = { version = "0.4.23", features = ["serde"] }
 regex = "1.7.0"                    # An implementation of regular expressions for Rust. This implementation uses finite automata …
+
+[dependencies.uuid]
+version = "1.2.2"
+features = [
+    "v4",                # Lets you generate random UUIDs
+    "fast-rng",          # Use a faster (but still sufficiently random) RNG
+    "macro-diagnostics", # Enable better diagnostics for compile-time UUIDs
+]
