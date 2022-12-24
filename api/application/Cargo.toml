@@ -13,3 +13,4 @@ shared = { path = "../shared" }
 diesel = { version = "2.0.0", features = ["postgres"] }
 serde_json = "1.0.88"
 rocket = { version = "0.5.0-rc.2", features = ["json"] }
+uuid = "1.2.2"                # A library to generate and parse UUIDs.

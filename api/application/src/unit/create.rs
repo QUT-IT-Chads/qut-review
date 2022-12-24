@@ -1,21 +1,20 @@
 use diesel::prelude::*;
-use domain::models::review::{NewReview, Review};
+use domain::models::unit::Unit;
 use infrastructure::ServerState;
 use rocket::{response::status::Created, serde::json::Json, State};
 use shared::response_models::{Response, ResponseBody};
 
-pub fn create_review(review: Json<NewReview>, state: &State<ServerState>) -> Created<String> {
-    use domain::schema::reviews;
-    let review = review.into_inner();
+pub fn create_unit(unit: Json<Unit>, state: &State<ServerState>) -> Created<String> {
+    use domain::schema::units;
 
-    println!("{:?}", review);
+    let unit = unit.into_inner();
 
     let pooled = &mut state.db_pool.get().unwrap();
 
-    let review = match pooled.transaction(move |c| {
-        diesel::insert_into(reviews::table)
-            .values(&review)
-            .get_result::<Review>(c)
+    let unit = match pooled.transaction(move |c| {
+        diesel::insert_into(units::table)
+            .values(&unit)
+            .get_result::<Unit>(c)
     }) {
         Ok(reviews) => reviews,
         Err(err) => match err {
@@ -26,7 +25,7 @@ pub fn create_review(review: Json<NewReview>, state: &State<ServerState>) -> Cre
     };
 
     let response = Response {
-        body: ResponseBody::Review(review),
+        body: ResponseBody::Unit(unit),
     };
     Created::new("")
         .tagged_body(serde_json::to_string(&response).expect("Return 500 internal server error."))

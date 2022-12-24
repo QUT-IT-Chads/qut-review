@@ -1,17 +1,22 @@
 use application::review::{create, delete, read, update};
 use domain::models::review::{NewReview, Review};
+use infrastructure::ServerState;
 use rocket::response::status::{Created, NotFound};
 use rocket::serde::json::Json;
-use rocket::{delete, get, post, put};
+use rocket::{delete, get, post, put, State};
 use shared::response_models::{DummyResponse, NetworkResponse, Response, ResponseBody};
 
 /// Returns a 200 OK containing JSON vector of all reviews
 #[get("/")]
-pub fn list_reviews_handler(demo_mode: Result<DummyResponse, NetworkResponse>) -> String {
+pub fn list_reviews_handler(
+    demo_mode: Result<DummyResponse, NetworkResponse>,
+    state: &State<ServerState>,
+) -> String {
     if let Ok(dummy_data) = demo_mode {
         return serde_json::to_string(&dummy_data).expect("Return 500 internal server error.");
     }
-    let reviews: Vec<Review> = read::list_reviews();
+
+    let reviews: Vec<Review> = read::list_reviews(state);
 
     let response = Response {
         body: ResponseBody::Reviews(reviews),
@@ -44,6 +49,7 @@ pub fn list_review_handler(
 pub fn create_review_handler(
     review: Json<NewReview>,
     demo_mode: Result<DummyResponse, NetworkResponse>,
+    state: &State<ServerState>,
 ) -> Created<String> {
     if let Ok(dummy_data) = demo_mode {
         return Created::new("").tagged_body(
@@ -51,7 +57,7 @@ pub fn create_review_handler(
         );
     }
 
-    create::create_review(review)
+    create::create_review(review, state)
 }
 
 /// Takes in a `review_id` and an approved `status` bool returning a 201 Created with the

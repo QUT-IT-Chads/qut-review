@@ -1,21 +1,23 @@
 use diesel::prelude::*;
-use domain::models::review::{NewReview, Review};
+use domain::models::user::{NewUser, NewUserWithUuid, User};
 use infrastructure::ServerState;
 use rocket::{response::status::Created, serde::json::Json, State};
 use shared::response_models::{Response, ResponseBody};
+use uuid::Uuid;
 
-pub fn create_review(review: Json<NewReview>, state: &State<ServerState>) -> Created<String> {
-    use domain::schema::reviews;
-    let review = review.into_inner();
+pub fn create_user(user: Json<NewUser>, state: &State<ServerState>) -> Created<String> {
+    use domain::schema::users;
 
-    println!("{:?}", review);
+    let user = user.into_inner();
+    let id = Uuid::new_v4();
+    let user = NewUserWithUuid::new(id, user);
 
     let pooled = &mut state.db_pool.get().unwrap();
 
-    let review = match pooled.transaction(move |c| {
-        diesel::insert_into(reviews::table)
-            .values(&review)
-            .get_result::<Review>(c)
+    let user = match pooled.transaction(move |c| {
+        diesel::insert_into(users::table)
+            .values(&user)
+            .get_result::<User>(c)
     }) {
         Ok(reviews) => reviews,
         Err(err) => match err {
@@ -26,7 +28,7 @@ pub fn create_review(review: Json<NewReview>, state: &State<ServerState>) -> Cre
     };
 
     let response = Response {
-        body: ResponseBody::Review(review),
+        body: ResponseBody::User(user),
     };
     Created::new("")
         .tagged_body(serde_json::to_string(&response).expect("Return 500 internal server error."))

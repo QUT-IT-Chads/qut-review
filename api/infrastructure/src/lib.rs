@@ -1,14 +1,22 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+use std::env;
+
+use diesel::{
+    r2d2::{ConnectionManager, Pool},
+    PgConnection,
+};
+
+pub type DbPool = Pool<ConnectionManager<PgConnection>>;
+
+pub struct ServerState {
+    pub db_pool: DbPool,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub fn establish_connection() -> Pool<ConnectionManager<PgConnection>> {
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+    let manager = ConnectionManager::<PgConnection>::new(&database_url);
+    Pool::builder()
+        .max_size(15)
+        .build(manager)
+        .expect("Failed to create pool.")
 }
