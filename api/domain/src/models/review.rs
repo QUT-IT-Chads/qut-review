@@ -2,10 +2,11 @@ use crate::enums::semester::Semester;
 use crate::schema::reviews;
 use chrono::NaiveDateTime;
 use diesel::prelude::*;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Insertable, Queryable, Serialize, Debug)]
+#[derive(Insertable, Queryable, Serialize, Debug, JsonSchema)]
 pub struct Review {
     pub id: i32,
     pub unit_code: String,
@@ -42,7 +43,7 @@ impl Review {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Debug, AsChangeset)]
+#[derive(Insertable, Deserialize, Serialize, Debug, AsChangeset, JsonSchema)]
 #[diesel(table_name = reviews)]
 pub struct NewReview {
     pub unit_code: String,

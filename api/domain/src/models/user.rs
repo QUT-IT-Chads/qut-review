@@ -1,16 +1,17 @@
 use crate::schema::users;
 use diesel::{Insertable, Queryable};
 use rocket::serde::uuid::Uuid;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-#[derive(Queryable, Debug, Deserialize, Serialize)]
+#[derive(Queryable, Debug, Deserialize, Serialize, JsonSchema)]
 pub struct User {
     id: Uuid,
     email: String,
     hashed_password: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, JsonSchema)]
 pub struct NewUser {
     email: String,
     hashed_password: String,

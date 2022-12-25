@@ -7,13 +7,11 @@ use rocket::serde::json::Json;
 use rocket::State;
 use shared::response_models::{Response, ResponseBody};
 
-use crate::serializer::serialize_response;
-
 pub fn approve_review(
     review_id: i32,
     status: bool,
     state: &State<ServerState>,
-) -> Result<String, NotFound<String>> {
+) -> Result<Json<Response>, NotFound<Json<Response>>> {
     use domain::schema::reviews::dsl::*;
 
     let pooled = &mut state.db_pool.get().unwrap();
@@ -28,7 +26,7 @@ pub fn approve_review(
                 body: ResponseBody::Review(review),
             };
 
-            return Ok(serialize_response(response));
+            return Ok(Json(response));
         }
         Err(err) => match err {
             diesel::result::Error::NotFound => {
@@ -39,7 +37,7 @@ pub fn approve_review(
                     )),
                 };
 
-                return Err(NotFound(serialize_response(response)));
+                return Err(NotFound(Json(response)));
             }
             _ => {
                 panic!("Database error - {}", err);
@@ -52,7 +50,7 @@ pub fn update_review(
     review_id: i32,
     review: Json<NewReview>,
     state: &State<ServerState>,
-) -> Result<Created<String>, NotFound<String>> {
+) -> Result<Created<String>, NotFound<Json<Response>>> {
     use domain::schema::reviews::dsl::*;
 
     let pooled = &mut state.db_pool.get().unwrap();
@@ -68,7 +66,7 @@ pub fn update_review(
                 body: ResponseBody::Review(review),
             };
 
-            return Ok(Created::new("").tagged_body(serialize_response(response)));
+            return Ok(Created::new("").tagged_body(serde_json::to_string(&response).expect("500 internal server error")));
         }
         Err(err) => match err {
             diesel::result::Error::NotFound => {
@@ -79,7 +77,7 @@ pub fn update_review(
                     )),
                 };
 
-                return Err(NotFound(serialize_response(response)));
+                return Err(NotFound(Json(response)));
             }
             _ => {
                 panic!("Database error - {}", err);

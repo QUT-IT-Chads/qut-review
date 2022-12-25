@@ -8,6 +8,7 @@ use rocket::{
     http::{uri::Path, RawStr},
     Responder,
 };
+use rocket_okapi::JsonSchema;
 
 #[derive(Responder, Debug)]
 pub enum NetworkResponse {
@@ -22,7 +23,7 @@ pub enum NetworkResponse {
     NoDemoData(String),
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, JsonSchema)]
 pub enum ResponseBody {
     Message(String),
 
@@ -38,7 +39,7 @@ pub enum ResponseBody {
     AuthToken(String),
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, JsonSchema)]
 #[serde(crate = "rocket::serde")]
 pub struct Response {
     pub body: ResponseBody,

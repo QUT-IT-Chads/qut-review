@@ -1,13 +1,11 @@
 use diesel::prelude::*;
 use domain::models::review::Review;
 use infrastructure::ServerState;
-use rocket::{response::status::NotFound, State};
+use rocket::{response::status::NotFound, State, serde::json::Json};
 use shared::response_models::{Response, ResponseBody};
 use uuid::Uuid;
 
-use crate::serializer::serialize_response;
-
-pub fn list_review(review_id: i32, state: &State<ServerState>) -> Result<String, NotFound<String>> {
+pub fn list_review(review_id: i32, state: &State<ServerState>) -> Result<Json<Response>, NotFound<Json<Response>>> {
     use domain::schema::reviews;
 
     let pooled = &mut state.db_pool.get().unwrap();
@@ -18,7 +16,7 @@ pub fn list_review(review_id: i32, state: &State<ServerState>) -> Result<String,
                 body: ResponseBody::Review(review),
             };
 
-            return Ok(serialize_response(response));
+            return Ok(Json(response));
         }
         Err(err) => match err {
             diesel::result::Error::NotFound => {
@@ -29,7 +27,7 @@ pub fn list_review(review_id: i32, state: &State<ServerState>) -> Result<String,
                     )),
                 };
 
-                return Err(NotFound(serialize_response(response)));
+                return Err(NotFound(Json(response)));
             }
             _ => {
                 panic!("Database error - {}", err);
@@ -56,7 +54,7 @@ pub fn list_reviews(state: &State<ServerState>) -> Vec<Review> {
 pub fn list_user_reviews(
     user_id: Uuid,
     state: &State<ServerState>,
-) -> Result<String, NotFound<String>> {
+) -> Result<Json<Response>, NotFound<Json<Response>>> {
     use domain::schema::reviews::{self, user_id as db_user_id};
 
     let pooled = &mut state.db_pool.get().unwrap();
@@ -72,7 +70,7 @@ pub fn list_user_reviews(
                 body: ResponseBody::Reviews(reviews),
             };
 
-            return Ok(serialize_response(response));
+            return Ok(Json(response));
         }
         Err(err) => match err {
             _ => {

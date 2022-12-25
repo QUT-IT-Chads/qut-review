@@ -1,14 +1,12 @@
 use diesel::prelude::*;
 use infrastructure::ServerState;
-use rocket::{response::status::NotFound, State};
+use rocket::{response::status::NotFound, State, serde::json::Json};
 use shared::response_models::{Response, ResponseBody};
-
-use crate::serializer::serialize_response;
 
 pub fn delete_review(
     review_id: i32,
     state: &State<ServerState>,
-) -> Result<String, NotFound<String>> {
+) -> Result<Json<Response>, NotFound<Json<Response>>> {
     use domain::schema::reviews::dsl::*;
 
     let pooled = &mut state.db_pool.get().unwrap();
@@ -23,7 +21,7 @@ pub fn delete_review(
                     )),
                 };
 
-                return Ok(serialize_response(response));
+                return Ok(Json(response));
             } else {
                 let response = Response {
                     body: ResponseBody::Message(format!(
@@ -32,7 +30,7 @@ pub fn delete_review(
                     )),
                 };
 
-                return Err(NotFound(serialize_response(response)));
+                return Err(NotFound(Json(response)));
             }
         }
         Err(err) => match err {
