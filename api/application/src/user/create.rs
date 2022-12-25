@@ -2,7 +2,6 @@ use diesel::prelude::*;
 use domain::models::user::{NewUser, NewUserWithUuid, User};
 use infrastructure::ServerState;
 use rocket::{response::status::Created, serde::json::Json, State};
-use shared::response_models::{Response, ResponseBody};
 use uuid::Uuid;
 
 pub fn create_user(user: Json<NewUser>, state: &State<ServerState>) -> Created<String> {
@@ -27,9 +26,6 @@ pub fn create_user(user: Json<NewUser>, state: &State<ServerState>) -> Created<S
         },
     };
 
-    let response = Response {
-        body: ResponseBody::User(user),
-    };
     Created::new("")
-        .tagged_body(serde_json::to_string(&response).expect("Return 500 internal server error."))
+        .tagged_body(serde_json::to_string(&user).expect("Return 500 internal server error."))
 }

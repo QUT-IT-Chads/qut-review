@@ -16,7 +16,6 @@ pub struct Review {
     pub teaching_period: Semester,
     pub date_published: NaiveDateTime,
     pub last_updated: NaiveDateTime,
-    /// Approval by admin - Review should not be visible until approved
     pub approved: bool,
     pub grade_achieved: Option<i32>,
     pub user_id: Uuid,

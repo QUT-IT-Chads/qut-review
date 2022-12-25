@@ -18,8 +18,6 @@ Here are all the required environment variables.
 ```
 # .env
 
-# Whether the api returns dummy data or not
-DEMO=false 
 DATABASE_URL=postgres://username:password@localhost/qut_review
 ```
 
