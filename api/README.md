@@ -12,6 +12,7 @@
 3. Run the project using: `cargo run`.
 
 ## Environment
+
 Here are all the required environment variables.
 
 ```
@@ -23,7 +24,9 @@ DATABASE_URL=postgres://username:password@localhost/qut_review
 ```
 
 ## Setting up your local database
-**Todo**
+
+1. Install PostgreSQL
+2. Create the database: `CREATE DATABASE qut_review`
 
 ## Technology Used
 

@@ -19,6 +19,7 @@ fn rocket() -> _ {
             routes![
                 review_handler::list_reviews_handler,
                 review_handler::list_review_handler,
+                review_handler::list_user_reviews_handler,
                 review_handler::create_review_handler,
                 review_handler::approve_review_handler,
                 review_handler::delete_review_handler,

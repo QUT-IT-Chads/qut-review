@@ -3,6 +3,7 @@ use domain::models::review::{NewReview, Review};
 use infrastructure::ServerState;
 use rocket::response::status::{Created, NotFound};
 use rocket::serde::json::Json;
+use rocket::serde::uuid::Uuid;
 use rocket::{delete, get, post, put, State};
 use shared::response_models::{DummyResponse, NetworkResponse, Response, ResponseBody};
 
@@ -36,7 +37,18 @@ pub fn list_review_handler(
     read::list_review(review_id, state)
 }
 
-/// Takes in a `NewReview` and returns a 201 Created with the created review as JSON
+#[get("/user/<user_id>")]
+pub fn list_user_reviews_handler(
+    user_id: Uuid,
+    demo_mode: Result<DummyResponse, NetworkResponse>,
+    state: &State<ServerState>,
+) -> Result<String, NotFound<String>> {
+    if let Ok(dummy_data) = demo_mode {
+        return Ok(serde_json::to_string(&dummy_data).expect("Return 500 internal server error."));
+    }
+    read::list_user_reviews(user_id, state)
+}
+
 #[post("/create", format = "application/json", data = "<review>")]
 pub fn create_review_handler(
     review: Json<NewReview>,

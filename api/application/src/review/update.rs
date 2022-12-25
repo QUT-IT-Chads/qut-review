@@ -1,5 +1,5 @@
 use diesel::prelude::*;
-use diesel::{Connection, RunQueryDsl};
+use diesel::Connection;
 use domain::models::review::{NewReview, Review};
 use infrastructure::ServerState;
 use rocket::response::status::{Created, NotFound};

@@ -3,6 +3,7 @@ use domain::models::review::Review;
 use infrastructure::ServerState;
 use rocket::{response::status::NotFound, State};
 use shared::response_models::{Response, ResponseBody};
+use uuid::Uuid;
 
 use crate::serializer::serialize_response;
 
@@ -44,6 +45,35 @@ pub fn list_reviews(state: &State<ServerState>) -> Vec<Review> {
 
     match pooled.transaction(move |c| reviews::table.load::<Review>(c)) {
         Ok(reviews) => reviews,
+        Err(err) => match err {
+            _ => {
+                panic!("Database error - {}", err);
+            }
+        },
+    }
+}
+
+pub fn list_user_reviews(
+    user_id: Uuid,
+    state: &State<ServerState>,
+) -> Result<String, NotFound<String>> {
+    use domain::schema::reviews::{self, user_id as db_user_id};
+
+    let pooled = &mut state.db_pool.get().unwrap();
+
+    match pooled.transaction(move |c| {
+        reviews::table
+            .select(reviews::all_columns)
+            .filter(db_user_id.eq(user_id))
+            .load::<Review>(c)
+    }) {
+        Ok(reviews) => {
+            let response = Response {
+                body: ResponseBody::Reviews(reviews),
+            };
+
+            return Ok(serialize_response(response));
+        }
         Err(err) => match err {
             _ => {
                 panic!("Database error - {}", err);
