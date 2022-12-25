@@ -42,14 +42,14 @@ impl Review {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Debug)]
+#[derive(Insertable, Deserialize, Serialize, Debug, AsChangeset)]
 #[diesel(table_name = reviews)]
 pub struct NewReview {
-    unit_code: String,
-    rating: i32,
-    passed_unit: bool,
-    review_body: String,
-    teaching_period: Semester,
-    grade_achieved: Option<i32>,
-    user_id: Uuid,
+    pub unit_code: String,
+    pub rating: i32,
+    pub passed_unit: bool,
+    pub review_body: String,
+    pub teaching_period: Semester,
+    pub grade_achieved: Option<i32>,
+    pub user_id: Uuid,
 }

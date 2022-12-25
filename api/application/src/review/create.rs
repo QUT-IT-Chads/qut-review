@@ -6,11 +6,9 @@ use shared::response_models::{Response, ResponseBody};
 
 pub fn create_review(review: Json<NewReview>, state: &State<ServerState>) -> Created<String> {
     use domain::schema::reviews;
-    let review = review.into_inner();
-
-    println!("{:?}", review);
 
     let pooled = &mut state.db_pool.get().unwrap();
+    let review = review.into_inner();
 
     let review = match pooled.transaction(move |c| {
         diesel::insert_into(reviews::table)

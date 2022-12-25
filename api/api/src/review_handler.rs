@@ -6,7 +6,6 @@ use rocket::serde::json::Json;
 use rocket::{delete, get, post, put, State};
 use shared::response_models::{DummyResponse, NetworkResponse, Response, ResponseBody};
 
-/// Returns a 200 OK containing JSON vector of all reviews
 #[get("/")]
 pub fn list_reviews_handler(
     demo_mode: Result<DummyResponse, NetworkResponse>,
@@ -25,23 +24,16 @@ pub fn list_reviews_handler(
     serde_json::to_string(&response).expect("Return 500 internal server error.")
 }
 
-/// Takes in a `review_id` and returns a 200 OK with the associated review as JSON
-/// otherwise, a 404 NotFound NetworkResponse.
 #[get("/<review_id>")]
 pub fn list_review_handler(
-    review_id: u32,
+    review_id: i32,
     demo_mode: Result<DummyResponse, NetworkResponse>,
+    state: &State<ServerState>,
 ) -> Result<String, NotFound<String>> {
     if let Ok(dummy_data) = demo_mode {
         return Ok(serde_json::to_string(&dummy_data).expect("Return 500 internal server error."));
     }
-    let review: Review = read::list_review(review_id)?;
-
-    let response = Response {
-        body: ResponseBody::Review(review),
-    };
-
-    Ok(serde_json::to_string(&response).expect("Return 500 internal server error."))
+    read::list_review(review_id, state)
 }
 
 /// Takes in a `NewReview` and returns a 201 Created with the created review as JSON
@@ -60,45 +52,38 @@ pub fn create_review_handler(
     create::create_review(review, state)
 }
 
-/// Takes in a `review_id` and an approved `status` bool returning a 201 Created with the
-/// associated review as JSON otherwise, a 404 NotFound NetworkResponse.
-///
-/// If no `status` is provided, it will default to `true`
 #[put("/approve/<review_id>?<status>")]
 pub fn approve_review_handler(
-    review_id: u32,
+    review_id: i32,
     status: Option<bool>,
     demo_mode: Result<DummyResponse, NetworkResponse>,
-) -> Result<Created<String>, NotFound<String>> {
-    if let Ok(dummy_data) = demo_mode {
-        return Ok(Created::new("").tagged_body(
-            serde_json::to_string(&dummy_data).expect("Return 500 internal server error."),
-        ));
-    }
-
-    update::approve_review(review_id, status.unwrap_or(true))
-}
-
-/// Takes in a `review_id` and returns a 200 OK
-/// otherwise, a 404 NotFound NetworkResponse
-#[delete("/<review_id>")]
-pub fn delete_review_handler(
-    review_id: u32,
-    demo_mode: Result<DummyResponse, NetworkResponse>,
+    state: &State<ServerState>,
 ) -> Result<String, NotFound<String>> {
     if let Ok(dummy_data) = demo_mode {
         return Ok(serde_json::to_string(&dummy_data).expect("Return 500 internal server error."));
     }
-    delete::delete_review(review_id)
+
+    update::approve_review(review_id, status.unwrap_or(true), state)
 }
 
-/// Takes in a `review_id` and `NewReview` object returning a 201 Created with the updated review as JSON
-/// otherwise, a 404 NotFound NetworkResponse
+#[delete("/<review_id>")]
+pub fn delete_review_handler(
+    review_id: i32,
+    demo_mode: Result<DummyResponse, NetworkResponse>,
+    state: &State<ServerState>,
+) -> Result<String, NotFound<String>> {
+    if let Ok(dummy_data) = demo_mode {
+        return Ok(serde_json::to_string(&dummy_data).expect("Return 500 internal server error."));
+    }
+    delete::delete_review(review_id, state)
+}
+
 #[post("/<review_id>", format = "application/json", data = "<review>")]
 pub fn update_review_handler(
-    review_id: u32,
+    review_id: i32,
     review: Json<NewReview>,
     demo_mode: Result<DummyResponse, NetworkResponse>,
+    state: &State<ServerState>,
 ) -> Result<Created<String>, NotFound<String>> {
     if let Ok(dummy_data) = demo_mode {
         return Ok(Created::new("").tagged_body(
@@ -106,5 +91,5 @@ pub fn update_review_handler(
         ));
     }
 
-    update::update_review(review_id, review)
+    update::update_review(review_id, review, state)
 }
