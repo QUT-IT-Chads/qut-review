@@ -36,3 +36,6 @@ The project is written in Rust using two main frameworks:
 - [Diesel.rs](https://diesel.rs/) - An ORM and Query Builder
 
 This project attempts to follow clean architecture practices to manage the project's architecture and file structure.
+
+## Documentation
+The API documenation can be found at `/api/rapi-doc`
