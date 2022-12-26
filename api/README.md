@@ -8,7 +8,25 @@
 ## Setup
 
 1. From the root directory (`/`), navigate to `api/` with: `cd api/`.
-2. Run the project using: `cargo run`.
+2. Create a `.env` file and copy the values found under **Environment**
+3. Run the project using: `cargo run`.
+
+## Environment
+
+Here are all the required environment variables.
+
+```
+# .env
+
+# Whether the api returns dummy data or not
+DEMO=false 
+DATABASE_URL=postgres://username:password@localhost/qut_review
+```
+
+## Setting up your local database
+
+1. Install PostgreSQL
+2. Create the database: `CREATE DATABASE qut_review`
 
 ## Technology Used
 

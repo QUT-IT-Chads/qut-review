@@ -1,6 +1,9 @@
+use crate::schema::units;
+use diesel::{Insertable, Queryable};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Queryable, Insertable, Debug, Deserialize, Serialize)]
+#[diesel(table_name = units)]
 pub struct Unit {
     unit_code: String,
     unit_name: String,

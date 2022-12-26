@@ -1,13 +1,35 @@
-use serde::{Deserialize, Serialize};
+use crate::schema::users;
+use diesel::{Insertable, Queryable};
 use rocket::serde::uuid::Uuid;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Queryable, Debug, Deserialize, Serialize)]
 pub struct User {
     id: Uuid,
     email: String,
     hashed_password: String,
-    settings: UserSettings,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-pub struct UserSettings {}
+#[derive(Deserialize)]
+pub struct NewUser {
+    email: String,
+    hashed_password: String,
+}
+
+#[derive(Insertable, Deserialize)]
+#[diesel(table_name = users)]
+pub struct NewUserWithUuid {
+    id: Uuid,
+    email: String,
+    hashed_password: String,
+}
+
+impl NewUserWithUuid {
+    pub fn new(id: Uuid, new_user: NewUser) -> Self {
+        NewUserWithUuid {
+            id,
+            email: new_user.email,
+            hashed_password: new_user.hashed_password
+        }
+    }
+}

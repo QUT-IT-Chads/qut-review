@@ -1,21 +1,23 @@
-use crate::{enums::semester::Semester, models::unit::Unit};
-use chrono::{DateTime, Utc};
-use uuid::Uuid;
+use crate::enums::semester::Semester;
+use crate::schema::reviews;
+use chrono::NaiveDateTime;
+use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Insertable, Queryable, Serialize, Debug)]
 pub struct Review {
-    pub id: u32,
-    pub unit: Unit,
-    pub rating: u8,
+    pub id: i32,
+    pub unit_code: String,
+    pub rating: i32,
     pub passed_unit: bool,
     pub review_body: String,
     pub teaching_period: Semester,
-    pub date_published: DateTime<Utc>,
-    pub last_updated: DateTime<Utc>,
+    pub date_published: NaiveDateTime,
+    pub last_updated: NaiveDateTime,
     /// Approval by admin - Review should not be visible until approved
     pub approved: bool,
-    pub grade_achieved: Option<u8>,
+    pub grade_achieved: Option<i32>,
     pub user_id: Uuid,
 }
 
@@ -26,13 +28,13 @@ impl Review {
 
         Review {
             id: 1,
-            unit: new_review.unit,
+            unit_code: new_review.unit_code,
             rating: new_review.rating,
             review_body: new_review.review_body,
             passed_unit: new_review.passed_unit,
             teaching_period: new_review.teaching_period,
-            date_published: DateTime::<Utc>::default(),
-            last_updated: DateTime::<Utc>::default(),
+            date_published: NaiveDateTime::default(),
+            last_updated: NaiveDateTime::default(),
             approved: false,
             grade_achieved: new_review.grade_achieved,
             user_id: uuid,
@@ -40,12 +42,14 @@ impl Review {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Insertable, Deserialize, Serialize, Debug, AsChangeset)]
+#[diesel(table_name = reviews)]
 pub struct NewReview {
-    unit: Unit,
-    rating: u8,
-    passed_unit: bool,
-    review_body: String,
-    teaching_period: Semester,
-    grade_achieved: Option<u8>,
+    pub unit_code: String,
+    pub rating: i32,
+    pub passed_unit: bool,
+    pub review_body: String,
+    pub teaching_period: Semester,
+    pub grade_achieved: Option<i32>,
+    pub user_id: Uuid,
 }

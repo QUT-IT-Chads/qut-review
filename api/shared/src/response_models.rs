@@ -1,5 +1,7 @@
 use crate::dummy_data::review_dummy_data;
 use domain::models::review::Review;
+use domain::models::unit::Unit;
+use domain::models::user::User;
 use regex::Regex;
 use rocket::serde::Serialize;
 use rocket::{
@@ -26,6 +28,12 @@ pub enum ResponseBody {
 
     Review(Review),
     Reviews(Vec<Review>),
+
+    Unit(Unit),
+    Units(Vec<Unit>),
+
+    User(User),
+    Users(Vec<User>),
 
     AuthToken(String),
 }
