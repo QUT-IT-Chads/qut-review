@@ -79,7 +79,6 @@ fn custom_openapi_spec() -> OpenApi {
             description: Some("Localhost".to_owned()),
             ..Default::default()
         }],
-        // Add paths that do not exist in Rocket (or add extra into to existing paths)
         ..Default::default()
     }
 }

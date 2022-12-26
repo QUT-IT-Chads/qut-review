@@ -14,6 +14,7 @@ pub struct Review {
     pub passed_unit: bool,
     pub review_body: String,
     pub teaching_period: Semester,
+    pub year_taken: i32,
     pub date_published: NaiveDateTime,
     pub last_updated: NaiveDateTime,
     pub approved: bool,
@@ -33,6 +34,7 @@ impl Review {
             review_body: new_review.review_body,
             passed_unit: new_review.passed_unit,
             teaching_period: new_review.teaching_period,
+            year_taken: 2022,
             date_published: NaiveDateTime::default(),
             last_updated: NaiveDateTime::default(),
             approved: false,
@@ -50,6 +52,7 @@ pub struct NewReview {
     pub passed_unit: bool,
     pub review_body: String,
     pub teaching_period: Semester,
+    pub year_taken: i32,
     pub grade_achieved: Option<i32>,
     pub user_id: Uuid,
 }

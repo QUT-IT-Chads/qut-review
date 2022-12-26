@@ -5,8 +5,8 @@ use okapi::openapi3::OpenApi;
 use rocket::response::status::Created;
 use rocket::serde::json::Json;
 use rocket::{post, State};
-use rocket_okapi::{openapi, openapi_get_routes_spec};
 use rocket_okapi::settings::OpenApiSettings;
+use rocket_okapi::{openapi, openapi_get_routes_spec};
 
 pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi) {
     openapi_get_routes_spec![settings: create_unit_handler]

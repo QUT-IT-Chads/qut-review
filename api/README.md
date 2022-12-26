@@ -24,7 +24,9 @@ DATABASE_URL=postgres://username:password@localhost/qut_review
 ## Setting up your local database
 
 1. Install PostgreSQL
-2. Create the database: `CREATE DATABASE qut_review`
+2. Install the [Diesel CLI](https://github.com/diesel-rs/diesel/tree/master/diesel_cli) tool
+3. Create the database: `CREATE DATABASE qut_review`
+4. Navigate into `infrastructure/` and run the latest migration: `diesel migration run`
 
 ## Technology Used
 
