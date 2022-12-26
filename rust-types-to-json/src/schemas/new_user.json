@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "NewUser",
+  "type": "object",
+  "required": [
+    "email",
+    "hashed_password"
+  ],
+  "properties": {
+    "email": {
+      "type": "string"
+    },
+    "hashed_password": {
+      "type": "string"
+    }
+  }
+}

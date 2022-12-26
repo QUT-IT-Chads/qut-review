@@ -18,15 +18,15 @@ Here are all the required environment variables.
 ```
 # .env
 
-# Whether the api returns dummy data or not
-DEMO=false 
 DATABASE_URL=postgres://username:password@localhost/qut_review
 ```
 
 ## Setting up your local database
 
 1. Install PostgreSQL
-2. Create the database: `CREATE DATABASE qut_review`
+2. Install the [Diesel CLI](https://github.com/diesel-rs/diesel/tree/master/diesel_cli) tool
+3. Create the database: `CREATE DATABASE qut_review`
+4. Navigate into `infrastructure/` and run the latest migration: `diesel migration run`
 
 ## Technology Used
 
@@ -36,3 +36,6 @@ The project is written in Rust using two main frameworks:
 - [Diesel.rs](https://diesel.rs/) - An ORM and Query Builder
 
 This project attempts to follow clean architecture practices to manage the project's architecture and file structure.
+
+## Documentation
+The API documenation can be found at `/api/rapi-doc`

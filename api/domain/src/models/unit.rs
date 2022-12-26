@@ -1,8 +1,9 @@
 use crate::schema::units;
 use diesel::{Insertable, Queryable};
+use rocket_okapi::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-#[derive(Queryable, Insertable, Debug, Deserialize, Serialize)]
+#[derive(Queryable, Insertable, Debug, Deserialize, Serialize, JsonSchema)]
 #[diesel(table_name = units)]
 pub struct Unit {
     unit_code: String,

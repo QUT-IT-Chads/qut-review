@@ -17,6 +17,7 @@ diesel::table! {
         passed_unit -> Bool,
         review_body -> Text,
         teaching_period -> Semester,
+        year_taken -> Int4,
         date_published -> Timestamp,
         last_updated -> Timestamp,
         approved -> Bool,
