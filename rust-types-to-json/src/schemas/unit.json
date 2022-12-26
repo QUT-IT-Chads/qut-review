@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Unit",
+  "type": "object",
+  "required": [
+    "unit_code",
+    "unit_description",
+    "unit_name"
+  ],
+  "properties": {
+    "unit_code": {
+      "type": "string"
+    },
+    "unit_name": {
+      "type": "string"
+    },
+    "unit_description": {
+      "type": "string"
+    }
+  }
+}
