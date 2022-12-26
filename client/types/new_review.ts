@@ -7,17 +7,13 @@
 
 export type Semester = "Summer" | "Sem1" | "Sem2";
 
-export interface Review {
-  id: number;
+export interface NewReview {
   unit_code: string;
   rating: number;
   passed_unit: boolean;
   review_body: string;
   teaching_period: Semester;
   year_taken: number;
-  date_published: string;
-  last_updated: string;
-  approved: boolean;
   grade_achieved?: number | null;
   user_id: string;
   [k: string]: unknown;
