@@ -1,7 +1,16 @@
-.headerContainer {
-    background-color: #245aac;
-    @apply h-[83px] w-full;
+.container {
+    @apply min-h-[4rem] w-full py-2 px-20;
     @apply flex items-center justify-between;
-    padding: 10px;
+
+    background-color: #245aac;
     color: white;
+}
+
+.title {
+    @apply text-3xl font-medium;
+
+}
+
+.item {
+    @apply text-base px-2 font-light hover:underline;
 }

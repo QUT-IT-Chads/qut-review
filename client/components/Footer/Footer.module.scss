@@ -1,0 +1,15 @@
+.container {
+    background-color: #1B1B1B;
+    @apply min-h-[4rem] w-full py-5 px-20;
+    @apply flex flex-col items-center justify-center;
+    color: white;
+}
+
+.item {
+    @apply mx-3;
+    @apply hover:underline;
+}
+
+.text {
+    @apply text-xs text-center;
+}
