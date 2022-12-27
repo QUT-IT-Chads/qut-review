@@ -12,7 +12,8 @@ module.exports = {
         'prettier'
     ],
     rules: {
-        'linebreak-style': ['error', 'unix']
+        'linebreak-style': ['error', 'unix'],
+        '@next/next/no-html-link-for-pages': 'off'
     },
     globals: {
         React: true,

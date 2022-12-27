@@ -1,0 +1,76 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Review",
+  "type": "object",
+  "required": [
+    "approved",
+    "date_published",
+    "id",
+    "last_updated",
+    "passed_unit",
+    "rating",
+    "review_body",
+    "teaching_period",
+    "unit_code",
+    "user_id",
+    "year_taken"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer",
+      "format": "int32"
+    },
+    "unit_code": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "integer",
+      "format": "int32"
+    },
+    "passed_unit": {
+      "type": "boolean"
+    },
+    "review_body": {
+      "type": "string"
+    },
+    "teaching_period": {
+      "$ref": "#/definitions/Semester"
+    },
+    "year_taken": {
+      "type": "integer",
+      "format": "int32"
+    },
+    "date_published": {
+      "type": "string",
+      "format": "partial-date-time"
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "partial-date-time"
+    },
+    "approved": {
+      "type": "boolean"
+    },
+    "grade_achieved": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "int32"
+    },
+    "user_id": {
+      "type": "string",
+      "format": "uuid"
+    }
+  },
+  "definitions": {
+    "Semester": {
+      "type": "string",
+      "enum": [
+        "Summer",
+        "Sem1",
+        "Sem2"
+      ]
+    }
+  }
+}
