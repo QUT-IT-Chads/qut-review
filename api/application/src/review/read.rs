@@ -32,12 +32,30 @@ pub fn list_review(
     }
 }
 
-pub fn list_reviews(state: &State<ServerState>) -> Json<Vec<Review>> {
+pub fn list_reviews(
+    _page: Option<i64>,
+    _limit: Option<i64>,
+    state: &State<ServerState>,
+) -> Json<Vec<Review>> {
     use domain::schema::reviews;
 
     let pooled = &mut state.db_pool.get().unwrap();
 
-    match pooled.transaction(move |c| reviews::table.load::<Review>(c)) {
+    match pooled.transaction(move |c| {
+        // Return paginated results
+        if _page.is_some() && _limit.is_some() {
+            let limit = _limit.unwrap();
+            let page = _page.unwrap();
+
+            return reviews::table
+                .limit(limit)
+                .offset(page * limit)
+                .load::<Review>(c);
+        }
+
+        // Return all reviews
+        reviews::table.load::<Review>(c)
+    }) {
         Ok(reviews) => Json(reviews),
         Err(err) => match err {
             _ => {
