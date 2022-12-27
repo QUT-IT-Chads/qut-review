@@ -13,6 +13,7 @@ fn create_dummy_review(unit_code: String, rating: i32) -> Review {
         passed_unit: true,
         review_body: String::new(),
         teaching_period: Semester::Sem1,
+        year_taken: 2022,
         date_published: NaiveDateTime::default(),
         last_updated: NaiveDateTime::default(),
         approved: true,

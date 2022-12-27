@@ -27,6 +27,7 @@ CREATE TABLE Reviews (
     passed_unit BOOLEAN NOT NULL,
     review_body TEXT NOT NULL,
     teaching_period Semester NOT NULL,
+    year_taken INT NOT NULL,
     date_published timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     last_updated timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
     approved BOOLEAN DEFAULT FALSE NOT NULL,
