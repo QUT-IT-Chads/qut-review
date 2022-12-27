@@ -11,9 +11,9 @@
 
     textarea {
         @apply flex flex-col items-start;
-        @apply p-3 gap-2;
+        @apply gap-2 p-3;
         @apply w-full;
-        background: #F8FAFC;
+        background: #f8fafc;
         border-radius: 4px;
 
         flex: none;

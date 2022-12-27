@@ -1,6 +1,6 @@
 import FormItem from '../FormItem';
 // import styles from './Dropdown.module.scss';
-import {default as ReactDropdown, Group, Option} from 'react-dropdown';
+import { default as ReactDropdown, Group, Option } from 'react-dropdown';
 
 interface DropdownProps {
     label: string;

@@ -15,7 +15,6 @@ body {
     font-family: 'Inter', sans-serif;
     text-decoration: none;
     @apply flex flex-col items-center justify-start;
-
 }
 
 main {
