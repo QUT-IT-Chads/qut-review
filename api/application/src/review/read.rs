@@ -43,10 +43,7 @@ pub fn list_reviews(
 
     match pooled.transaction(move |c| {
         // Return paginated results
-        if _page.is_some() && _limit.is_some() {
-            let limit = _limit.unwrap();
-            let page = _page.unwrap();
-
+        if let (Some(page), Some(limit)) = (_page, _limit) {
             return reviews::table
                 .limit(limit)
                 .offset(page * limit)
