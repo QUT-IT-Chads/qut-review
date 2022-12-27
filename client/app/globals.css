@@ -14,4 +14,16 @@ body {
     margin: 0;
     font-family: 'Inter', sans-serif;
     text-decoration: none;
+    @apply flex flex-col items-center justify-start;
+
+}
+
+main {
+    /* Max width constraints for large screens */
+    @apply lg:max-w-7xl;
+}
+
+h1 {
+    @apply text-4xl;
+    font-weight: 600;
 }

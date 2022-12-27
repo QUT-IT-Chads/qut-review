@@ -1,0 +1,21 @@
+.group {
+    @apply flex flex-col items-center justify-start gap-4;
+    @apply w-full;
+}
+
+.control {
+    @apply w-full;
+    label {
+        @apply text-sm text-gray-700;
+    }
+
+    textarea {
+        @apply flex flex-col items-start;
+        @apply p-3 gap-2;
+        @apply w-full;
+        background: #F8FAFC;
+        border-radius: 4px;
+
+        flex: none;
+    }
+}

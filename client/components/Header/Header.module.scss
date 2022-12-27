@@ -1,7 +1,30 @@
-.headerContainer {
-    background-color: #245aac;
+.container {
+    @apply flex flex-row items-center justify-between;
     @apply h-[83px] w-full;
-    @apply flex items-center justify-between;
-    padding: 10px;
+    background-color: #245aac;
+    padding: 10px calc(max(20px, 0.5 * (100% - 80rem)));
     color: white;
+}
+
+.containerLeft {
+    @apply flex items-center justify-start gap-x-6;
+}
+
+.containerRight {
+    @apply flex items-center justify-end;
+}
+
+.reviewWrite {
+    @apply flex flex-row items-center justify-start;
+    @apply h-14 w-full;
+    background-color: #ebebeb;
+    @apply shadow-md rounded-md;
+    padding: 10px calc(max(20px, 0.5 * (100% - 80rem)));
+    color: #245aac;
+
+    transition: background-color 0.2s ease-in-out;
+
+    &:hover {
+        background-color: #e4e4e4;
+    }
 }
