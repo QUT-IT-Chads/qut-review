@@ -24,9 +24,9 @@ pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, O
 
 /// Get a list of all reviews
 #[openapi(tag = "Reviews")]
-#[get("/")]
-pub fn list_reviews_handler(state: &State<ServerState>) -> Json<Vec<Review>> {
-    read::list_reviews(state)
+#[get("/?<_page>&<_limit>")]
+pub fn list_reviews_handler(_page: Option<i64>, _limit: Option<i64>, state: &State<ServerState>) -> Json<Vec<Review>> {
+    read::list_reviews(_page, _limit, state)
 }
 
 /// Get a review by ID
