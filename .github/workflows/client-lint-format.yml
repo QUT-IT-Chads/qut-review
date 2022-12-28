@@ -1,4 +1,4 @@
-name: Client Lint and Format
+name: Client Refactor CI
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ defaults:
     working-directory: client
 
 jobs:
-  lint-format:
+  refactor:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -40,9 +40,9 @@ jobs:
         run: |
           echo "modified=$(
             if git status --porcelain | grep -P -q '^.*M'; then
-              echo "false";
-            else
               echo "true";
+            else
+              echo "false";
             fi
           )" >> $GITHUB_OUTPUT
 
@@ -51,7 +51,7 @@ jobs:
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -u
+          git commit -u -m "ci(client): lint and format client/"
 
       - name: Push changes to PR
         env:
