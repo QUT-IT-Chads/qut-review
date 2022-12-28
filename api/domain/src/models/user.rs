@@ -1,10 +1,10 @@
 use crate::schema::users;
-use diesel::{Insertable, Queryable};
+use diesel::{Insertable, Queryable, AsChangeset};
 use rocket::serde::uuid::Uuid;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-#[derive(Insertable, Queryable, Debug, Deserialize, Serialize, JsonSchema)]
+#[derive(Insertable, Queryable, Deserialize, Serialize, JsonSchema, AsChangeset)]
 #[diesel(table_name = users)]
 pub struct User {
     id: Uuid,
