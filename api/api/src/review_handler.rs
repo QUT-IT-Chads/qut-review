@@ -2,7 +2,7 @@ use application::review::{create, delete, read, update};
 use domain::models::review::{NewReview, Review};
 use infrastructure::ServerState;
 use okapi::openapi3::OpenApi;
-use rocket::response::status::{Created, NotFound};
+use rocket::response::status::{Created, NotFound, Conflict};
 use rocket::serde::json::Json;
 use rocket::serde::uuid::Uuid;
 use rocket::{delete, get, post, put, State};
@@ -55,7 +55,7 @@ pub fn list_user_reviews_handler(
 pub fn create_review_handler(
     review: Json<NewReview>,
     state: &State<ServerState>,
-) -> Created<String> {
+) -> Result<Created<String>, Conflict<String>> {
     create::create_review(review, state)
 }
 

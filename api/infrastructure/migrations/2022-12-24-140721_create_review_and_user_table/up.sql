@@ -36,4 +36,5 @@ CREATE TABLE Reviews (
     CONSTRAINT fk_author
         FOREIGN KEY(user_id) 
             REFERENCES Users(id)
+                ON DELETE CASCADE
 );
