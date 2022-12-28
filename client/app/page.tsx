@@ -68,5 +68,6 @@ export default function Page() {
                     <RecentCard key={key} recent={recent} />
                 ))}
             </div>
-        </div>);
+        </div>
+    );
 }
