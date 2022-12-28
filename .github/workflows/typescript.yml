@@ -97,7 +97,7 @@ jobs:
       - name: Clean-up unnecessary files
         working-directory: rust-types-to-json
         run: |
-          rm src\index.js
+          rm src/index.js
           rm -d out/types
 
       - name: Look for changes
