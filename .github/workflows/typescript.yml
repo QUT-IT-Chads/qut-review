@@ -92,13 +92,13 @@ jobs:
           node src/index.js
 
       - name: Move types to client/
-        run: mv -v rust-types-to-json/src/types/* client/types/
+        run: mv -v rust-types-to-json/out/types/* client/types/
 
       - name: Clean-up unnecessary files
         working-directory: rust-types-to-json
         run: |
           rm src\index.js
-          rm -d src/types
+          rm -d out/types
 
       - name: Look for changes
         id: type-export
