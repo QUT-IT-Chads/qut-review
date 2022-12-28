@@ -98,7 +98,7 @@ jobs:
         id: type-export
         run: |
           echo "modified=$(
-            if git status --porcelain | grep -P -q 'client/types'; then
+            if git status --porcelain | grep -q 'client/types'; then
               echo "true";
             else
               echo "false";
@@ -106,7 +106,7 @@ jobs:
           )" >> $GITHUB_OUTPUT
 
       - name: Commit changes
-        if: steps.changes.outputs.modified == 'true'
+        if: steps.type-export.outputs.modified == 'true'
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
