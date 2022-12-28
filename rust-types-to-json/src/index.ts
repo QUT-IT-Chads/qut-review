@@ -9,6 +9,8 @@ async function compileAll(dir: string, filename: string) {
 
 // Find all schemas in the schemas directory
 async function main() {
+    await fs.mkdir('out/types', { recursive: true });
+
     const dir = 'src/schemas';
     const filenames = await fs.readdir(dir);
     filenames
