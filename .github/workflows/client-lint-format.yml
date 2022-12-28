@@ -27,7 +27,7 @@ jobs:
           cache-dependency-path: client/yarn.lock
 
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       - name: Lint with ESLint
         run: yarn run lint:fix
@@ -39,7 +39,7 @@ jobs:
         id: changes
         run: |
           echo "modified=$(
-            if git status --porcelain | grep -P -q '^.*M'; then
+            if git status --porcelain | grep -P -q '^\s*M'; then
               echo "true";
             else
               echo "false";
