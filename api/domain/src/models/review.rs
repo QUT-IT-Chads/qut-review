@@ -44,7 +44,7 @@ impl Review {
     }
 }
 
-#[derive(Insertable, Deserialize, Serialize, Debug, AsChangeset, JsonSchema)]
+#[derive(Insertable, Deserialize, Serialize, Debug, AsChangeset, JsonSchema, Clone)]
 #[diesel(table_name = reviews)]
 pub struct NewReview {
     pub unit_code: String,

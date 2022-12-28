@@ -2,7 +2,7 @@ use application::review::{create, delete, read, update};
 use domain::models::review::{NewReview, Review};
 use infrastructure::ServerState;
 use okapi::openapi3::OpenApi;
-use rocket::response::status::{Created, NotFound};
+use rocket::response::status::{Created, NotFound, Conflict};
 use rocket::serde::json::Json;
 use rocket::serde::uuid::Uuid;
 use rocket::{delete, get, post, put, State};
@@ -24,9 +24,9 @@ pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, O
 
 /// Get a list of all reviews
 #[openapi(tag = "Reviews")]
-#[get("/")]
-pub fn list_reviews_handler(state: &State<ServerState>) -> Json<Vec<Review>> {
-    read::list_reviews(state)
+#[get("/?<_page>&<_limit>")]
+pub fn list_reviews_handler(_page: Option<i64>, _limit: Option<i64>, state: &State<ServerState>) -> Json<Vec<Review>> {
+    read::list_reviews(_page, _limit, state)
 }
 
 /// Get a review by ID
@@ -55,7 +55,7 @@ pub fn list_user_reviews_handler(
 pub fn create_review_handler(
     review: Json<NewReview>,
     state: &State<ServerState>,
-) -> Created<String> {
+) -> Result<Created<String>, Conflict<String>> {
     create::create_review(review, state)
 }
 
