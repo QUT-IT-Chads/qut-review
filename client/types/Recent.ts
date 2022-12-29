@@ -4,6 +4,7 @@ export interface Recent {
     unitDescription: string;
     score: number;
     reviewed: Date;
+    reviews: number;
 }
 
 export default Recent;

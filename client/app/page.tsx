@@ -1,4 +1,5 @@
 import RecentCard from './(components)/(RecentCard)';
+import RecentDropdown from './(components)/(RecentDropdown)';
 import Recent from 'types/Recent';
 
 const recents: Array<Recent> = [
@@ -22,7 +23,8 @@ const recents: Array<Recent> = [
             filtering or classification and unsupervised method for topic
             modelling); and future directions in Web Intelligence.`,
         score: 5,
-        reviewed: new Date()
+        reviewed: new Date(),
+        reviews: 3
     },
     {
         unitCode: 'CAB202',
@@ -38,7 +40,8 @@ const recents: Array<Recent> = [
             This provides a valuable foundation for further studies in areas such
             as robotics and networking.`,
         score: 5,
-        reviewed: new Date()
+        reviewed: new Date(),
+        reviews: 3
     },
     {
         unitCode: 'IFB104',
@@ -56,18 +59,21 @@ const recents: Array<Recent> = [
             later subjects that teach large-scale software development using
             industrial-strength programming languages.`,
         score: 5,
-        reviewed: new Date()
+        reviewed: new Date(),
+        reviews: 3
     }
 ];
 
 export default function Page() {
     return (
         <div className="p-5">
-            <div className="grid grid-rows-3 gap-8 lg:grid-cols-3">
+            <div className="grid gap-8 lg:grid-cols-3">
                 {recents.map((recent, key) => (
                     <RecentCard key={key} recent={recent} />
                 ))}
             </div>
+            <RecentDropdown /> {/*key={key} recent={recents.at(0)} />*/}
+
         </div>
     );
 }

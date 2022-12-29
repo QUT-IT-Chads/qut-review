@@ -6,8 +6,7 @@ interface recentProps {
 }
 
 const RecentCard = (props: recentProps) => {
-    const { unitCode, unitName, unitDescription, score, reviewed } =
-        props.recent;
+    const { unitCode, unitName, unitDescription, score, reviewed } = props.recent;
 
     const MAX_LENGTH = 485;
     let fixedDescription = '';
