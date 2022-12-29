@@ -1,9 +1,0 @@
-.formItemContainer {
-    @apply flex flex-col items-stretch justify-start gap-2;
-    @apply w-[30rem];
-
-    label {
-        @apply text-lg;
-        color: #6f7482;
-    }
-}
