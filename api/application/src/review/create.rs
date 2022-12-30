@@ -1,22 +1,20 @@
 use diesel::prelude::*;
-use domain::models::review::{NewReview, Review};
+use domain::models::review::{NewReview, Review, NewReviewWithId};
 use infrastructure::ServerState;
-use rocket::{
-    response::status::{Conflict, Created},
-    serde::json::Json,
-    State,
-};
-use shared::response_models::ResponseMessage;
+use rocket::{http::Status, response::status::Created, serde::json::Json, State};
+use shared::{response_models::ResponseMessage, token::JWT};
 
 pub fn create_review(
     review: Json<NewReview>,
     state: &State<ServerState>,
-) -> Result<Created<String>, Conflict<String>> {
+    token: JWT,
+) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
     use domain::schema::reviews;
 
     let pooled = &mut state.db_pool.get().unwrap();
 
     let review = review.into_inner();
+    let review = NewReviewWithId::new(token.claims.sub, review);
 
     let review_count: i64 = match pooled.transaction(|c| {
         reviews::table
@@ -39,9 +37,7 @@ pub fn create_review(
             message: String::from("Account has already review the desired unit"),
         };
 
-        return Err(Conflict(Some(
-            serde_json::to_string(&response).expect("Return 500 internal server error."),
-        )));
+        return Err((Status::Conflict, Json(response)));
     }
 
     let review = match pooled.transaction(|c| {

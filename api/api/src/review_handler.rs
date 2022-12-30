@@ -2,6 +2,7 @@ use application::review::{create, delete, read, update};
 use domain::models::review::{NewReview, Review};
 use infrastructure::ServerState;
 use okapi::openapi3::OpenApi;
+use rocket::http::Status;
 use rocket::response::status::{Created, NotFound, Conflict};
 use rocket::serde::json::Json;
 use rocket::serde::uuid::Uuid;
@@ -9,6 +10,7 @@ use rocket::{delete, get, post, put, State};
 use rocket_okapi::settings::OpenApiSettings;
 use rocket_okapi::{openapi, openapi_get_routes_spec};
 use shared::response_models::ResponseMessage;
+use shared::token::JWT;
 
 pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi) {
     openapi_get_routes_spec![
@@ -55,8 +57,11 @@ pub fn list_user_reviews_handler(
 pub fn create_review_handler(
     review: Json<NewReview>,
     state: &State<ServerState>,
-) -> Result<Created<String>, Conflict<String>> {
-    create::create_review(review, state)
+    token: Result<JWT, (Status, Json<ResponseMessage>)>,
+) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
+    let token = token?;
+
+    create::create_review(review, state, token)
 }
 
 /// Approve or disapprove a review
@@ -66,8 +71,11 @@ pub fn approve_review_handler(
     review_id: i32,
     status: Option<bool>,
     state: &State<ServerState>,
-) -> Result<Json<Review>, NotFound<Json<ResponseMessage>>> {
-    update::approve_review(review_id, status.unwrap_or(true), state)
+    token: Result<JWT, (Status, Json<ResponseMessage>)>,
+) -> Result<Json<Review>, (Status, Json<ResponseMessage>)> {
+    let token = token?;
+
+    update::approve_review(review_id, status.unwrap_or(true), state, token)
 }
 
 /// Delete a review
@@ -76,8 +84,11 @@ pub fn approve_review_handler(
 pub fn delete_review_handler(
     review_id: i32,
     state: &State<ServerState>,
-) -> Result<Json<ResponseMessage>, NotFound<Json<ResponseMessage>>> {
-    delete::delete_review(review_id, state)
+    token: Result<JWT, (Status, Json<ResponseMessage>)>,
+) -> Result<Json<ResponseMessage>, (Status, Json<ResponseMessage>)> {
+    let token = token?;
+
+    delete::delete_review(review_id, state, token)
 }
 
 /// Update a review
@@ -87,6 +98,9 @@ pub fn update_review_handler(
     review_id: i32,
     review: Json<NewReview>,
     state: &State<ServerState>,
-) -> Result<Created<String>, NotFound<Json<ResponseMessage>>> {
-    update::update_review(review_id, review, state)
+    token: Result<JWT, (Status, Json<ResponseMessage>)>,
+) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
+    let token = token?;
+
+    update::update_review(review_id, review, state, token)
 }
