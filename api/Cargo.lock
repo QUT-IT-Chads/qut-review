@@ -55,6 +55,7 @@ dependencies = [
  "dotenvy",
  "indexmap",
  "infrastructure",
+ "jsonwebtoken",
  "okapi",
  "rocket",
  "rocket_okapi",

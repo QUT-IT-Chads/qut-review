@@ -55,7 +55,10 @@ impl User {
             id,
             email: new_user.email,
             hashed_password: new_user.hashed_password,
-            role: Role::User,
+            role: match new_user.role {
+                Some(role) => role,
+                None => Role::User
+            },
         }
     }
 }

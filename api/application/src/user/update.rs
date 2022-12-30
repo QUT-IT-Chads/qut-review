@@ -1,20 +1,32 @@
 use diesel::prelude::*;
 use diesel::Connection;
+use domain::enums::role::Role;
 use domain::models::user::GetUser;
 use domain::models::user::{NewUser, User};
 use infrastructure::ServerState;
-use rocket::response::status::{Created, NotFound};
+use rocket::http::Status;
+use rocket::response::status::Created;
 use rocket::serde::json::Json;
 use rocket::State;
 use shared::response_models::ResponseMessage;
+use shared::token::JWT;
 use uuid::Uuid;
 
 pub fn update_user(
     user_id: Uuid,
     user: Json<NewUser>,
     state: &State<ServerState>,
-) -> Result<Created<String>, NotFound<Json<ResponseMessage>>> {
+    token: JWT,
+) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
     use domain::schema::users::dsl::users;
+
+    if token.claims.sub != user_id && token.claims.role != Role::Admin {
+        let response = ResponseMessage {
+            message: (String::from("You do not have access to perform this action.")),
+        };
+
+        return Err((Status::Unauthorized, Json(response)));
+    }
 
     let pooled = &mut state.db_pool.get().unwrap();
     let user = user.into_inner();
@@ -36,7 +48,7 @@ pub fn update_user(
                     message: format!("Error: user with user id {} not found - {}", user_id, err),
                 };
 
-                return Err(NotFound(Json(response)));
+                return Err((Status::NotFound, Json(response)));
             }
             _ => {
                 panic!("Database error - {}", err);

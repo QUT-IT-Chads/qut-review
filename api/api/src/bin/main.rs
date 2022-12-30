@@ -5,7 +5,7 @@ use dotenvy::dotenv;
 use infrastructure::{establish_connection, ServerState};
 use okapi::openapi3::OpenApi;
 use rocket_okapi::mount_endpoints_and_merged_docs;
-use rocket_okapi::rapidoc::{make_rapidoc, GeneralConfig, HideShowConfig, RapiDocConfig};
+use rocket_okapi::rapidoc::{make_rapidoc, GeneralConfig, HideShowConfig, RapiDocConfig, ApiConfig};
 use rocket_okapi::settings::UrlObject;
 
 #[launch]
