@@ -14,6 +14,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - uses: actions/cache@v3
+      with:
+        path: ~/.cargo
+        key: cargo-cache-${{ hashFiles('**/Cargo.toml') }}
+        restore-keys: cargo-cache-
     - name: Build
       working-directory: api
       run: cargo build --verbose
