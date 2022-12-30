@@ -16,7 +16,7 @@ pub fn list_user(
 
     if token.claims.sub != user_id && token.claims.role != Role::Admin {
         let response = ResponseMessage {
-            message: (String::from("You do not have access to perform this action.")),
+            message: Some(String::from("You do not have access to perform this action.")),
         };
 
         return Err((Status::Unauthorized, Json(response)));
@@ -30,7 +30,7 @@ pub fn list_user(
         Err(err) => match err {
             diesel::result::Error::NotFound => {
                 let response = ResponseMessage {
-                    message: (format!("Error: user with user id {} not found - {}", user_id, err)),
+                    message: Some(String::from("User could not be found.")),
                 };
 
                 return Err((Status::NotFound, Json(response)));

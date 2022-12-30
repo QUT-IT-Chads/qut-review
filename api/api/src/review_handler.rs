@@ -3,7 +3,7 @@ use domain::models::review::{NewReview, Review};
 use infrastructure::ServerState;
 use okapi::openapi3::OpenApi;
 use rocket::http::Status;
-use rocket::response::status::{Created, NotFound, Conflict};
+use rocket::response::status::{Created, NotFound};
 use rocket::serde::json::Json;
 use rocket::serde::uuid::Uuid;
 use rocket::{delete, get, post, put, State};
@@ -16,6 +16,7 @@ pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, O
     openapi_get_routes_spec![
         settings: list_review_handler,
         list_reviews_handler,
+        list_unit_reviews_handler,
         list_user_reviews_handler,
         create_review_handler,
         approve_review_handler,
@@ -27,8 +28,24 @@ pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, O
 /// Get a list of all reviews
 #[openapi(tag = "Reviews")]
 #[get("/?<_page>&<_limit>")]
-pub fn list_reviews_handler(_page: Option<i64>, _limit: Option<i64>, state: &State<ServerState>) -> Json<Vec<Review>> {
+pub fn list_reviews_handler(
+    _page: Option<i64>,
+    _limit: Option<i64>,
+    state: &State<ServerState>,
+) -> Json<Vec<Review>> {
     read::list_reviews(_page, _limit, state)
+}
+
+/// Get a list of all reviews sorted by unit code
+#[openapi(tag = "Reviews")]
+#[get("/unit/<unit_code>?<_page>&<_limit>")]
+pub fn list_unit_reviews_handler(
+    unit_code: String,
+    _page: Option<i64>,
+    _limit: Option<i64>,
+    state: &State<ServerState>,
+) -> Json<Vec<Review>> {
+    read::list_unit_reviews(unit_code, _page, _limit, state)
 }
 
 /// Get a review by ID

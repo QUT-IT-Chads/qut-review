@@ -20,7 +20,7 @@ pub fn update_unit(
 
     if token.claims.role != Role::Admin {
         let response = ResponseMessage {
-            message: (String::from("You do not have access to perform this action.")),
+            message: Some(String::from("You do not have access to perform this action.")),
         };
 
         return Err((Status::Unauthorized, Json(response)));
@@ -41,10 +41,7 @@ pub fn update_unit(
         Err(err) => match err {
             diesel::result::Error::NotFound => {
                 let response = ResponseMessage {
-                    message: format!(
-                        "Error: unit with unit code {} not found - {}",
-                        unit_code, err
-                    ),
+                    message: Some(format!("The unit {} could not be found", unit_code)),
                 };
 
                 return Err((Status::NotFound, Json(response)));

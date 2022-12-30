@@ -27,7 +27,7 @@ pub fn login_user(
         Err(err) => match err {
             diesel::result::Error::NotFound => {
                 let response = ResponseMessage {
-                    message: String::from("Error: Invalid credentials"),
+                    message: Some(String::from("Invalid credentials")),
                 };
 
                 return Err(Unauthorized(Some(Json(response))));

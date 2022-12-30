@@ -7,9 +7,8 @@ pub struct AuthToken {
     pub token: String,
 }
 
-#[derive(Debug, Serialize, JsonSchema)]
+#[derive(Debug, Serialize, JsonSchema, Clone)]
 #[serde(crate = "rocket::serde")]
-// TODO: convert `message` to Option<&str>
 pub struct ResponseMessage {
-    pub message: String,
+    pub message: Option<String>,
 }

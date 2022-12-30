@@ -13,7 +13,7 @@ pub fn create_unit(
 
     if token.claims.role != Role::Admin {
         let response = ResponseMessage {
-            message: (String::from("You do not have access to perform this action.")),
+            message: Some(String::from("You do not have access to perform this action.")),
         };
 
         return Err((Status::Unauthorized, Json(response)));
@@ -40,7 +40,7 @@ pub fn create_unit(
 
     if unit_count > 0 {
         let response = ResponseMessage {
-            message: String::from("Unit already exists"),
+            message: Some(String::from("Unit already exists")),
         };
 
         return Err((Status::Conflict, Json(response)));

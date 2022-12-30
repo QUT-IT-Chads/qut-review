@@ -60,9 +60,7 @@ impl<'r> FromRequest<'r> for JWT {
                 Status::Unauthorized,
                 (
                     Status::Unauthorized,
-                    Json(ResponseMessage {
-                        message: String::new(),
-                    }),
+                    Json(ResponseMessage { message: None }),
                 ),
             )),
             Some(key) => match is_valid(key) {
@@ -73,7 +71,7 @@ impl<'r> FromRequest<'r> for JWT {
                         (
                             Status::Unauthorized,
                             Json(ResponseMessage {
-                                message: String::from("Error: Expired Signature"),
+                                message: Some(String::from("Expired Signature")),
                             }),
                         ),
                     )),
@@ -81,9 +79,7 @@ impl<'r> FromRequest<'r> for JWT {
                         Status::Unauthorized,
                         (
                             Status::Unauthorized,
-                            Json(ResponseMessage {
-                                message: String::from("Error: Expired Signature"),
-                            }),
+                            Json(ResponseMessage { message: None }),
                         ),
                     )),
                 },

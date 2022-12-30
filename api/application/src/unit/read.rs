@@ -19,10 +19,7 @@ pub fn list_unit(
         Err(err) => match err {
             diesel::result::Error::NotFound => {
                 let response = ResponseMessage {
-                    message: (format!(
-                        "Error: unit with unit code {} not found - {}",
-                        unit_code, err
-                    )),
+                    message: Some(format!("The unit '{}' could not found", unit_code)),
                 };
 
                 return Err((Status::NotFound, Json(response)));

@@ -19,7 +19,7 @@ pub fn delete_review(
         Err(err) => match err {
             diesel::result::Error::NotFound => {
                 let response = ResponseMessage {
-                    message: format!("Error: review with ID {} not found", review_id),
+                    message: Some(String::from("Review could not be found")),
                 };
 
                 return Err((Status::NotFound, Json(response)));
@@ -32,7 +32,7 @@ pub fn delete_review(
 
     if token.claims.sub != review.user_id && token.claims.role != Role::Admin {
         let response = ResponseMessage {
-            message: (String::from("You do not have access to perform this action.")),
+            message: Some(String::from("You do not have access to perform this action.")),
         };
 
         return Err((Status::Unauthorized, Json(response)));
@@ -42,13 +42,13 @@ pub fn delete_review(
         Ok(affected_count) => {
             if affected_count > 0 {
                 let response = ResponseMessage {
-                    message: format!("Successfully deleted review with ID {}", review_id),
+                    message: None,
                 };
 
                 return Ok(Json(response));
             } else {
                 let response = ResponseMessage {
-                    message: format!("Error: review with ID {} not found", review_id),
+                    message: Some(String::from("Review could not be found")),
                 };
 
                 return Err((Status::NotFound, Json(response)));

@@ -20,7 +20,7 @@ pub fn list_review(
         Err(err) => match err {
             diesel::result::Error::NotFound => {
                 let response = ResponseMessage {
-                    message: (format!("Error: review with ID {} not found - {}", review_id, err)),
+                    message: Some(String::from("Review could not be found")),
                 };
 
                 return Err(NotFound(Json(response)));
@@ -54,6 +54,44 @@ pub fn list_reviews(
         reviews::table.load::<Review>(c)
     }) {
         Ok(reviews) => Json(reviews),
+        Err(err) => match err {
+            _ => {
+                panic!("Database error - {}", err);
+            }
+        },
+    }
+}
+
+pub fn list_unit_reviews(
+    unit_code: String,
+    _page: Option<i64>,
+    _limit: Option<i64>,
+    state: &State<ServerState>,
+) -> Json<Vec<Review>> {
+    use domain::schema::reviews::{self, unit_code as db_unit_code};
+
+    let pooled = &mut state.db_pool.get().unwrap();
+
+    match pooled.transaction(move |c| {
+        // Return paginated results
+        if let (Some(page), Some(limit)) = (_page, _limit) {
+            return reviews::table
+                .select(reviews::all_columns)
+                .filter(db_unit_code.eq(unit_code))
+                .limit(limit)
+                .offset(page * limit)
+                .load::<Review>(c);
+        }
+
+        // Return all reviews by unit
+        reviews::table
+            .select(reviews::all_columns)
+            .filter(db_unit_code.eq(unit_code))
+            .load::<Review>(c)
+    }) {
+        Ok(reviews) => {
+            return Json(reviews);
+        }
         Err(err) => match err {
             _ => {
                 panic!("Database error - {}", err);

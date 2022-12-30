@@ -34,7 +34,7 @@ pub fn create_user(
 
     if user_count > 0 {
         let response = ResponseMessage {
-            message: String::from("Email is already in use"),
+            message: Some(String::from("Email is already in use")),
         };
 
         return Err((Status::Conflict, Json(response)));

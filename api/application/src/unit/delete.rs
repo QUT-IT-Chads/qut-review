@@ -13,7 +13,7 @@ pub fn delete_unit(
 
     if token.claims.role != Role::Admin {
         let response = ResponseMessage {
-            message: (String::from("You do not have access to perform this action.")),
+            message: Some(String::from("You do not have access to perform this action.")),
         };
 
         return Err((Status::Unauthorized, Json(response)));
@@ -27,13 +27,13 @@ pub fn delete_unit(
         Ok(affected_count) => {
             if affected_count > 0 {
                 let response = ResponseMessage {
-                    message: format!("Successfully deleted unit with unit code {}", unit_code),
+                    message: None,
                 };
 
                 return Ok(Json(response));
             } else {
                 let response = ResponseMessage {
-                    message: format!("Error: unit with unit code {} not found", unit_code),
+                    message: Some(format!("The unit '{}' could not found", unit_code)),
                 };
 
                 return Err((Status::NotFound, Json(response)));

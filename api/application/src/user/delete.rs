@@ -14,7 +14,7 @@ pub fn delete_user(
 
     if token.claims.sub != user_id && token.claims.role != Role::Admin {
         let response = ResponseMessage {
-            message: (String::from("You do not have access to perform this action.")),
+            message: Some(String::from("You do not have access to perform this action.")),
         };
 
         return Err((Status::Unauthorized, Json(response)));
@@ -28,13 +28,13 @@ pub fn delete_user(
         Ok(affected_count) => {
             if affected_count > 0 {
                 let response = ResponseMessage {
-                    message: format!("Successfully deleted user with user id {}", user_id),
+                    message: None,
                 };
 
                 return Ok(Json(response));
             } else {
                 let response = ResponseMessage {
-                    message: String::from("User not found"),
+                    message: Some(String::from("User not found")),
                 };
 
                 return Err((Status::NotFound, Json(response)));

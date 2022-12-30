@@ -34,7 +34,7 @@ pub fn create_review(
 
     if review_count > 0 {
         let response = ResponseMessage {
-            message: String::from("Account has already review the desired unit"),
+            message: Some(String::from("Account has already review the desired unit")),
         };
 
         return Err((Status::Conflict, Json(response)));

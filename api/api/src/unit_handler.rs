@@ -3,7 +3,7 @@ use domain::models::unit::Unit;
 use infrastructure::ServerState;
 use okapi::openapi3::OpenApi;
 use rocket::http::Status;
-use rocket::response::status::{Created, NotFound};
+use rocket::response::status::Created;
 use rocket::serde::json::Json;
 use rocket::{delete, get, post, State};
 use rocket_okapi::settings::OpenApiSettings;
