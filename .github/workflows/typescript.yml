@@ -1,0 +1,121 @@
+name: TypeScript
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  refactor:
+
+    needs: schema-export
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: client
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Checkout PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr checkout ${{ github.event.pull_request.number }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'yarn'
+          cache-dependency-path: client/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint with ESLint
+        run: yarn run lint:fix
+
+      - name: Format with Prettier
+        run: yarn run format:fix
+
+      - name: Look for changes
+        id: refactor
+        run: |
+          echo "modified=$(
+            if git status --porcelain | grep -P -q 'client/(?:app|components)'; then
+              echo "true";
+            else
+              echo "false";
+            fi
+          )" >> $GITHUB_OUTPUT
+
+      - name: Commit changes
+        if: steps.refactor.outputs.modified == 'true'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add app components
+          git commit -m "GitHub Actions: Refactor TypeScript files"
+
+      - name: Push changes to PR
+        if: steps.refactor.outputs.modified == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: git push
+
+  schema-export:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Checkout PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr checkout ${{ github.event.pull_request.number }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'yarn'
+          cache-dependency-path: rust-types-to-json/yarn.lock
+
+      - name: Install dependencies
+        working-directory: rust-types-to-json
+        run: yarn install --frozen-lockfile
+
+      - name: Export types
+        working-directory: rust-types-to-json
+        run: |
+          tsc src/index.ts
+          node src/index.js
+
+      - name: Move types to client/
+        run: mv -v rust-types-to-json/out/types/* client/types/
+
+      - name: Look for changes
+        id: type-export
+        run: |
+          echo "modified=$(
+            if git status --porcelain | grep -q 'client/types'; then
+              echo "true";
+            else
+              echo "false";
+            fi
+          )" >> $GITHUB_OUTPUT
+
+      - name: Commit changes
+        if: steps.type-export.outputs.modified == 'true'
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add client/types
+          git commit -m "GitHub Actions: Export Rust types to TypeScript"
+
+      - name: Push changes to PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: git push
