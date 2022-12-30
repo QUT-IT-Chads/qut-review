@@ -6,9 +6,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Queryable, Insertable, Debug, Deserialize, Serialize, JsonSchema, AsChangeset)]
 #[diesel(table_name = units)]
 pub struct Unit {
-    unit_code: String,
-    unit_name: String,
-    unit_description: String,
+    pub unit_code: String,
+    pub unit_name: String,
+    pub unit_description: String,
 }
 
 impl Unit {
