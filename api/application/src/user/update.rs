@@ -31,6 +31,14 @@ pub fn update_user(
     let pooled = &mut state.db_pool.get().unwrap();
     let user = user.into_inner();
 
+    if user.role == Role::Admin && token.claims.role != Role::Admin {
+        let response = ResponseMessage {
+            message: Some(String::from("You do not have access to perform this action.")),
+        };
+
+        return Err((Status::Unauthorized, Json(response)));
+    }
+
     match pooled.transaction(move |c| {
         diesel::update(users.find(user_id))
             .set(user)

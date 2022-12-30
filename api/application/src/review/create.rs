@@ -1,5 +1,5 @@
 use diesel::prelude::*;
-use domain::models::review::{NewReview, Review, NewReviewWithId};
+use domain::models::review::{NewReview, NewReviewWithId, Review};
 use infrastructure::ServerState;
 use rocket::{http::Status, response::status::Created, serde::json::Json, State};
 use shared::{response_models::ResponseMessage, token::JWT};
@@ -10,6 +10,7 @@ pub fn create_review(
     token: JWT,
 ) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
     use domain::schema::reviews;
+    use domain::schema::units;
 
     let pooled = &mut state.db_pool.get().unwrap();
 
@@ -38,6 +39,36 @@ pub fn create_review(
         };
 
         return Err((Status::Conflict, Json(response)));
+    }
+
+    let unit_count: i64 = match pooled.transaction(|c| {
+        units::table
+            .select(units::all_columns)
+            .filter(units::unit_code.eq(&review.unit_code))
+            .count()
+            .load(c)
+    }) {
+        Ok(unit_count) => unit_count[0],
+        Err(err) => match err {
+            diesel::result::Error::NotFound => {
+                let response = ResponseMessage {
+                    message: Some(String::from("Unit does not exist.")),
+                };
+
+                return Err((Status::NotFound, Json(response)));
+            }
+            _ => {
+                panic!("Database error - {}", err);
+            }
+        },
+    };
+
+    if unit_count > 0 {
+        let response = ResponseMessage {
+            message: Some(String::from("Unit does not exist.")),
+        };
+
+        return Err((Status::NotFound, Json(response)));
     }
 
     let review = match pooled.transaction(|c| {

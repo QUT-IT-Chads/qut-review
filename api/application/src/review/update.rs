@@ -20,7 +20,9 @@ pub fn approve_review(
 
     if token.claims.role != Role::Admin {
         let response = ResponseMessage {
-            message: Some(String::from("You do not have access to perform this action.")),
+            message: Some(String::from(
+                "You do not have access to perform this action.",
+            )),
         };
 
         return Err((Status::Unauthorized, Json(response)));
@@ -63,27 +65,28 @@ pub fn update_review(
     let pooled = &mut state.db_pool.get().unwrap();
     let review = review.into_inner();
 
-    let db_review: Review = match pooled
-        .transaction(|c| reviews::table.find(review_id).first::<Review>(c))
-    {
-        Ok(review) => review,
-        Err(err) => match err {
-            diesel::result::Error::NotFound => {
-                let response = ResponseMessage {
-                    message: Some(format!("The review with ID {} not found", review_id)),
-                };
+    let db_review: Review =
+        match pooled.transaction(|c| reviews::table.find(review_id).first::<Review>(c)) {
+            Ok(review) => review,
+            Err(err) => match err {
+                diesel::result::Error::NotFound => {
+                    let response = ResponseMessage {
+                        message: Some(format!("The review with ID {} not found", review_id)),
+                    };
 
-                return Err((Status::NotFound, Json(response)));
-            }
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
-    };
+                    return Err((Status::NotFound, Json(response)));
+                }
+                _ => {
+                    panic!("Database error - {}", err);
+                }
+            },
+        };
 
     if token.claims.sub != db_review.user_id && token.claims.role != Role::Admin {
         let response = ResponseMessage {
-            message: Some(String::from("You do not have access to perform this action.")),
+            message: Some(String::from(
+                "You do not have access to perform this action.",
+            )),
         };
 
         return Err((Status::Unauthorized, Json(response)));
