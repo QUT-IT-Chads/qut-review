@@ -60,7 +60,7 @@ impl<'r> FromRequest<'r> for JWT {
                 Status::Unauthorized,
                 (
                     Status::Unauthorized,
-                    Json(ResponseMessage { message: None }),
+                    Json(ResponseMessage { message: Some(String::from("No token provided.")) }),
                 ),
             )),
             Some(key) => match is_valid(key) {

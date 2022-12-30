@@ -34,12 +34,14 @@ impl From<User> for GetUser {
     }
 }
 
+
+
 #[derive(Insertable, Queryable, Deserialize, Serialize, JsonSchema, AsChangeset)]
 #[diesel(table_name = users)]
 pub struct NewUser {
     pub email: String,
     pub hashed_password: String,
-    pub role: Option<Role>,
+    pub role: Role,
 }
 
 #[derive(Insertable, Queryable, Deserialize, Serialize, JsonSchema, AsChangeset)]
@@ -49,16 +51,23 @@ pub struct LoginRequest {
     pub hashed_password: String,
 }
 
+impl From<LoginRequest> for NewUser {
+    fn from(user: LoginRequest) -> Self {
+        NewUser {
+            email: user.email,
+            hashed_password: user.hashed_password,
+            role: Role::User,
+        }
+    }
+}
+
 impl User {
     pub fn new(id: Uuid, new_user: NewUser) -> Self {
         User {
             id,
             email: new_user.email,
             hashed_password: new_user.hashed_password,
-            role: match new_user.role {
-                Some(role) => role,
-                None => Role::User
-            },
+            role: new_user.role,
         }
     }
 }

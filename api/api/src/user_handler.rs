@@ -15,6 +15,7 @@ use shared::token::JWT;
 pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi) {
     openapi_get_routes_spec![
         settings: create_user_handler,
+        create_user_with_role_handler,
         list_user_handler,
         delete_user_handler,
         update_user_handler,
@@ -26,10 +27,23 @@ pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, O
 #[openapi(tag = "Users")]
 #[post("/create", format = "application/json", data = "<user>")]
 pub fn create_user_handler(
-    user: Json<NewUser>,
+    user: Json<LoginRequest>,
     state: &State<ServerState>,
 ) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
     create::create_user(user, state)
+}
+
+/// Create a new user with role
+#[openapi(tag = "Users")]
+#[post("/admincreate", format = "application/json", data = "<user>")]
+pub fn create_user_with_role_handler(
+    user: Json<NewUser>,
+    state: &State<ServerState>,
+    token: Result<JWT, (Status, Json<ResponseMessage>)>,
+) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
+    let token = token?;
+
+    create::create_admin_user(user, state, token)
 }
 
 /// Get a user by id
