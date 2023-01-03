@@ -1,5 +1,5 @@
 use application::user::{create, delete, login, read, update};
-use domain::models::user::{GetUser, LoginRequest, NewUser};
+use domain::models::user::{GetUser, LoginRequest, UpdateUser};
 use infrastructure::ServerState;
 use okapi::openapi3::OpenApi;
 use rocket::http::Status;
@@ -63,7 +63,7 @@ pub fn delete_user_handler(
 #[post("/<user_id>", format = "application/json", data = "<user>")]
 pub fn update_user_handler(
     user_id: Uuid,
-    user: Json<NewUser>,
+    user: Json<UpdateUser>,
     state: &State<ServerState>,
     token: Result<JWT, (Status, Json<ResponseMessage>)>,
 ) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {

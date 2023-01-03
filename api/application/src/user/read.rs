@@ -30,7 +30,7 @@ pub fn list_user(
     match pooled.transaction(move |c| users::table.find(user_id).first::<User>(c)) {
         Ok(user) => {
             // Converting User to GetUser which removes password
-            return Ok(Json(user.into()));
+            return Ok(Json(user.get_public()));
         }
         Err(err) => match err {
             diesel::result::Error::NotFound => {

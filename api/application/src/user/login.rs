@@ -23,7 +23,7 @@ pub fn login_user(
             .filter(users::hashed_password.eq(&user.hashed_password))
             .first::<User>(c)
     }) {
-        Ok(user) => user.into(),
+        Ok(user) => user.get_public(),
         Err(err) => match err {
             diesel::result::Error::NotFound => {
                 let response = ResponseMessage {

@@ -21,7 +21,7 @@ pub fn create_user(
     let user_count: i64 = match pooled.transaction(|c| {
         users::table
             .select(users::all_columns)
-            .filter(users::email.eq(&user.email))
+            .filter(users::email.eq(&user.get_public().email))
             .count()
             .load(c)
     }) {
@@ -46,7 +46,7 @@ pub fn create_user(
             .values(&user)
             .get_result::<User>(c)
     }) {
-        Ok(user) => user.into(),
+        Ok(user) => user.get_public(),
         Err(err) => match err {
             _ => {
                 panic!("Database error - {}", err);

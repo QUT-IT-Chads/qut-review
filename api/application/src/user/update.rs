@@ -1,8 +1,7 @@
 use diesel::prelude::*;
 use diesel::Connection;
 use domain::enums::role::Role;
-use domain::models::user::GetUser;
-use domain::models::user::{NewUser, User};
+use domain::models::user::{ UpdateUser, User };
 use infrastructure::ServerState;
 use rocket::http::Status;
 use rocket::response::status::Created;
@@ -14,7 +13,7 @@ use uuid::Uuid;
 
 pub fn update_user(
     user_id: Uuid,
-    user: Json<NewUser>,
+    user: Json<UpdateUser>,
     state: &State<ServerState>,
     token: JWT,
 ) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
@@ -22,7 +21,9 @@ pub fn update_user(
 
     if token.claims.sub != user_id && token.claims.role != Role::Admin {
         let response = ResponseMessage {
-            message: Some(String::from("You do not have access to perform this action.")),
+            message: Some(String::from(
+                "You do not have access to perform this action.",
+            )),
         };
 
         return Err((Status::Unauthorized, Json(response)));
@@ -33,7 +34,9 @@ pub fn update_user(
 
     if user.role == Role::Admin && token.claims.role != Role::Admin {
         let response = ResponseMessage {
-            message: Some(String::from("You do not have access to perform this action.")),
+            message: Some(String::from(
+                "You do not have access to perform this action.",
+            )),
         };
 
         return Err((Status::Unauthorized, Json(response)));
@@ -45,7 +48,7 @@ pub fn update_user(
             .get_result::<User>(c)
     }) {
         Ok(user) => {
-            let user: GetUser = user.into();
+            let user = user.get_public();
 
             return Ok(Created::new("")
                 .tagged_body(serde_json::to_string(&user).expect("500 internal server error")));
