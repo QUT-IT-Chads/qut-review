@@ -1,13 +1,15 @@
-use application::unit::{create, read, delete, update};
+use application::unit::{create, delete, read, update};
 use domain::models::unit::Unit;
 use infrastructure::ServerState;
 use okapi::openapi3::OpenApi;
-use rocket::response::status::{Created, NotFound};
+use rocket::http::Status;
+use rocket::response::status::Created;
 use rocket::serde::json::Json;
-use rocket::{get, post, delete, State};
+use rocket::{delete, get, post, State};
 use rocket_okapi::settings::OpenApiSettings;
 use rocket_okapi::{openapi, openapi_get_routes_spec};
 use shared::response_models::ResponseMessage;
+use shared::token::JWT;
 
 pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi) {
     openapi_get_routes_spec![
@@ -32,15 +34,21 @@ pub fn list_units_handler(state: &State<ServerState>) -> Json<Vec<Unit>> {
 pub fn list_unit_handler(
     unit_code: &str,
     state: &State<ServerState>,
-) -> Result<Json<Unit>, NotFound<Json<ResponseMessage>>> {
+) -> Result<Json<Unit>, (Status, Json<ResponseMessage>)> {
     read::list_unit(unit_code, state)
 }
 
 /// Create a new unit
 #[openapi(tag = "Units")]
 #[post("/create", format = "application/json", data = "<unit>")]
-pub fn create_unit_handler(unit: Json<Unit>, state: &State<ServerState>) -> Created<String> {
-    create::create_unit(unit, state)
+pub fn create_unit_handler(
+    unit: Json<Unit>,
+    state: &State<ServerState>,
+    token: Result<JWT, (Status, Json<ResponseMessage>)>,
+) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
+    let token = token?;
+
+    create::create_unit(unit, state, token)
 }
 
 /// Delete a unit
@@ -49,8 +57,11 @@ pub fn create_unit_handler(unit: Json<Unit>, state: &State<ServerState>) -> Crea
 pub fn delete_unit_handler(
     unit_code: &str,
     state: &State<ServerState>,
-) -> Result<Json<ResponseMessage>, NotFound<Json<ResponseMessage>>> {
-    delete::delete_unit(unit_code, state)
+    token: Result<JWT, (Status, Json<ResponseMessage>)>,
+) -> Result<Json<ResponseMessage>, (Status, Json<ResponseMessage>)> {
+    let token = token?;
+
+    delete::delete_unit(unit_code, state, token)
 }
 
 /// Update a unit
@@ -60,6 +71,9 @@ pub fn update_unit_handler(
     unit_code: &str,
     unit: Json<Unit>,
     state: &State<ServerState>,
-) -> Result<Created<String>, NotFound<Json<ResponseMessage>>> {
-    update::update_unit(unit_code, unit, state)
+    token: Result<JWT, (Status, Json<ResponseMessage>)>,
+) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
+    let token = token?;
+
+    update::update_unit(unit_code, unit, state, token)
 }

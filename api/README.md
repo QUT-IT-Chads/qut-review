@@ -18,6 +18,7 @@ Here are all the required environment variables.
 ```
 # .env
 
+JWT_SECRET=localhost_secret
 DATABASE_URL=postgres://username:password@localhost/qut_review
 ```
 

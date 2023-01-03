@@ -2,6 +2,10 @@
 
 pub mod sql_types {
     #[derive(diesel::sql_types::SqlType)]
+    #[diesel(postgres_type(name = "role"))]
+    pub struct Role;
+
+    #[derive(diesel::sql_types::SqlType)]
     #[diesel(postgres_type(name = "semester"))]
     pub struct Semester;
 }
@@ -35,10 +39,14 @@ diesel::table! {
 }
 
 diesel::table! {
+    use diesel::sql_types::*;
+    use super::sql_types::Role;
+
     users (id) {
         id -> Uuid,
         email -> Varchar,
         hashed_password -> Varchar,
+        role -> Role,
     }
 }
 

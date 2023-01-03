@@ -1,23 +1,20 @@
 use diesel::prelude::*;
-use domain::models::user::{GetUser, NewUser, User};
+use domain::models::user::{GetUser, LoginRequest, User};
 use infrastructure::ServerState;
-use rocket::{
-    response::status::{Conflict, Created},
-    serde::json::Json,
-    State,
-};
+use rocket::{http::Status, response::status::Created, serde::json::Json, State};
 use shared::response_models::ResponseMessage;
 use uuid::Uuid;
 
 pub fn create_user(
-    user: Json<NewUser>,
+    user: Json<LoginRequest>,
     state: &State<ServerState>,
-) -> Result<Created<String>, Conflict<String>> {
+) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
     use domain::schema::users;
 
     let user = user.into_inner();
+
     let id = Uuid::new_v4();
-    let user = User::new(id, user);
+    let user = User::new(id, user.into());
 
     let pooled = &mut state.db_pool.get().unwrap();
 
@@ -38,12 +35,10 @@ pub fn create_user(
 
     if user_count > 0 {
         let response = ResponseMessage {
-            message: String::from("Email is already in use"),
+            message: Some(String::from("Email is already in use")),
         };
 
-        return Err(Conflict(Some(
-            serde_json::to_string(&response).expect("Return 500 internal server error."),
-        )));
+        return Err((Status::Conflict, Json(response)));
     }
 
     let user: GetUser = match pooled.transaction(|c| {

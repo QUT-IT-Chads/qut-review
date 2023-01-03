@@ -1,13 +1,13 @@
 use diesel::prelude::*;
 use domain::models::unit::Unit;
 use infrastructure::ServerState;
-use rocket::{response::status::NotFound, serde::json::Json, State};
+use rocket::{http::Status, serde::json::Json, State};
 use shared::response_models::ResponseMessage;
 
 pub fn list_unit(
     unit_code: &str,
     state: &State<ServerState>,
-) -> Result<Json<Unit>, NotFound<Json<ResponseMessage>>> {
+) -> Result<Json<Unit>, (Status, Json<ResponseMessage>)> {
     use domain::schema::units;
 
     let pooled = &mut state.db_pool.get().unwrap();
@@ -19,10 +19,10 @@ pub fn list_unit(
         Err(err) => match err {
             diesel::result::Error::NotFound => {
                 let response = ResponseMessage {
-                    message: (format!("Error: unit with unit code {} not found - {}", unit_code, err)),
+                    message: Some(format!("The unit '{}' could not found", unit_code)),
                 };
 
-                return Err(NotFound(Json(response)));
+                return Err((Status::NotFound, Json(response)));
             }
             _ => {
                 panic!("Database error - {}", err);

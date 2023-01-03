@@ -1,18 +1,30 @@
 use diesel::prelude::*;
 use diesel::Connection;
+use domain::enums::role::Role;
 use domain::models::unit::Unit;
 use infrastructure::ServerState;
-use rocket::response::status::{Created, NotFound};
+use rocket::http::Status;
+use rocket::response::status::Created;
 use rocket::serde::json::Json;
 use rocket::State;
 use shared::response_models::ResponseMessage;
+use shared::token::JWT;
 
 pub fn update_unit(
     unit_code: &str,
     unit: Json<Unit>,
     state: &State<ServerState>,
-) -> Result<Created<String>, NotFound<Json<ResponseMessage>>> {
-    use domain::schema::units::dsl::{units, unit_code as db_unit_code};
+    token: JWT,
+) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
+    use domain::schema::units::dsl::{unit_code as db_unit_code, units};
+
+    if token.claims.role != Role::Admin {
+        let response = ResponseMessage {
+            message: Some(String::from("You do not have access to perform this action.")),
+        };
+
+        return Err((Status::Unauthorized, Json(response)));
+    }
 
     let pooled = &mut state.db_pool.get().unwrap();
     let unit = unit.into_inner();
@@ -29,10 +41,10 @@ pub fn update_unit(
         Err(err) => match err {
             diesel::result::Error::NotFound => {
                 let response = ResponseMessage {
-                    message: format!("Error: unit with unit code {} not found - {}", unit_code, err),
+                    message: Some(format!("The unit {} could not be found", unit_code)),
                 };
 
-                return Err(NotFound(Json(response)));
+                return Err((Status::NotFound, Json(response)));
             }
             _ => {
                 panic!("Database error - {}", err);

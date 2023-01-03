@@ -5,6 +5,11 @@ CREATE TYPE Semester AS ENUM (
     'sem2'
 );
 
+CREATE TYPE Role AS ENUM (
+    'user',
+    'admin'
+);
+
 CREATE TABLE Units (
     unit_code VARCHAR PRIMARY KEY,
     unit_name VARCHAR NOT NULL NOT NULL,
@@ -14,7 +19,8 @@ CREATE TABLE Units (
 CREATE TABLE Users (
     id UUID PRIMARY KEY,
     email VARCHAR NOT NULL,
-    hashed_password VARCHAR NOT NULL
+    hashed_password VARCHAR NOT NULL,
+    role Role DEFAULT 'user' NOT NULL
 );
 
 CREATE TABLE Reviews (

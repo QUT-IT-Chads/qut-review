@@ -1,3 +1,7 @@
 **/*/.env
 **/*/node_modules
 **/*/.vscode
+api/application/src/.DS_Store
+api/application/.DS_Store
+api/.DS_Store
+.DS_Store

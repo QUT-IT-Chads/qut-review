@@ -1,5 +1,6 @@
+use crate::enums::role::Role;
 use crate::schema::users;
-use diesel::{Insertable, Queryable, AsChangeset};
+use diesel::{AsChangeset, Insertable, Queryable};
 use rocket::serde::uuid::Uuid;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -8,16 +9,19 @@ use serde::{Deserialize, Serialize};
 #[derive(Insertable, Queryable, Deserialize, Serialize, JsonSchema, AsChangeset)]
 #[diesel(table_name = users)]
 pub struct User {
-    id: Uuid,
+    pub id: Uuid,
     pub email: String,
     hashed_password: String,
+    pub role: Role,
 }
 
 /// Use this structure when returning a user to the frontend
-#[derive(Deserialize, Serialize, JsonSchema)]
+#[derive(Insertable, Queryable, Deserialize, Serialize, JsonSchema, AsChangeset)]
+#[diesel(table_name = users)]
 pub struct GetUser {
-    id: Uuid,
-    email: String,
+    pub id: Uuid,
+    pub email: String,
+    pub role: Role,
 }
 
 impl From<User> for GetUser {
@@ -25,15 +29,36 @@ impl From<User> for GetUser {
         GetUser {
             id: user.id,
             email: user.email,
+            role: user.role,
         }
     }
 }
 
+
+
 #[derive(Insertable, Queryable, Deserialize, Serialize, JsonSchema, AsChangeset)]
 #[diesel(table_name = users)]
 pub struct NewUser {
-    email: String,
-    hashed_password: String,
+    pub email: String,
+    pub hashed_password: String,
+    pub role: Role,
+}
+
+#[derive(Insertable, Queryable, Deserialize, Serialize, JsonSchema, AsChangeset)]
+#[diesel(table_name = users)]
+pub struct LoginRequest {
+    pub email: String,
+    pub hashed_password: String,
+}
+
+impl From<LoginRequest> for NewUser {
+    fn from(user: LoginRequest) -> Self {
+        NewUser {
+            email: user.email,
+            hashed_password: user.hashed_password,
+            role: Role::User,
+        }
+    }
 }
 
 impl User {
@@ -41,7 +66,8 @@ impl User {
         User {
             id,
             email: new_user.email,
-            hashed_password: new_user.hashed_password
+            hashed_password: new_user.hashed_password,
+            role: new_user.role,
         }
     }
 }

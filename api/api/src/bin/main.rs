@@ -16,24 +16,22 @@ fn rocket() -> _ {
         db_pool: establish_connection(),
     };
 
-    let mut building_rocket = rocket::build()
-        .manage(state)
-        .mount(
-            "/api/rapi-doc",
-            make_rapidoc(&RapiDocConfig {
-                title: Some("Qut Review | RapiDoc".to_owned()),
-                general: GeneralConfig {
-                    spec_urls: vec![UrlObject::new("General", "../../openapi.json")],
-                    ..Default::default()
-                },
-                hide_show: HideShowConfig {
-                    allow_spec_url_load: false,
-                    allow_spec_file_load: false,
-                    ..Default::default()
-                },
+    let mut building_rocket = rocket::build().manage(state).mount(
+        "/api/rapi-doc",
+        make_rapidoc(&RapiDocConfig {
+            title: Some("Qut Review | RapiDoc".to_owned()),
+            general: GeneralConfig {
+                spec_urls: vec![UrlObject::new("General", "../../openapi.json")],
                 ..Default::default()
-            }),
-        );
+            },
+            hide_show: HideShowConfig {
+                allow_spec_url_load: false,
+                allow_spec_file_load: false,
+                ..Default::default()
+            },
+            ..Default::default()
+        }),
+    );
 
     let openapi_settings = rocket_okapi::settings::OpenApiSettings::default();
     let custom_route_spec = (vec![], custom_openapi_spec());
