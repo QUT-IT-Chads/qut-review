@@ -1,7 +1,7 @@
 use diesel::prelude::*;
 use diesel::Connection;
 use domain::enums::role::Role;
-use domain::models::user::{ UpdateUser, User };
+use domain::models::user::{UpdateUser, User};
 use infrastructure::ServerState;
 use rocket::http::Status;
 use rocket::response::status::Created;
@@ -11,6 +11,8 @@ use shared::response_models::ResponseMessage;
 use shared::token::JWT;
 use uuid::Uuid;
 
+use crate::auth::has_user_permissions;
+
 pub fn update_user(
     user_id: Uuid,
     user: Json<UpdateUser>,
@@ -19,14 +21,8 @@ pub fn update_user(
 ) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
     use domain::schema::users::dsl::users;
 
-    if token.claims.sub != user_id && token.claims.role != Role::Admin {
-        let response = ResponseMessage {
-            message: Some(String::from(
-                "You do not have access to perform this action.",
-            )),
-        };
-
-        return Err((Status::Unauthorized, Json(response)));
+    if let Err(err) = has_user_permissions(&token, &user_id) {
+        return Err(err);
     }
 
     let pooled = &mut state.db_pool.get().unwrap();

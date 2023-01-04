@@ -4,7 +4,8 @@ use infrastructure::ServerState;
 use rocket::{http::Status, response::status::Created, serde::json::Json, State};
 use shared::{response_models::ResponseMessage, token::JWT};
 
-use crate::auth::{has_user_permissions, unit_exists};
+use crate::auth::has_user_permissions;
+use crate::database_helpers::unit_exists;
 
 pub fn create_review(
     review: Json<NewReview>,
@@ -21,33 +22,42 @@ pub fn create_review(
 
     let pooled = &mut state.db_pool.get().unwrap();
 
-    if let Err(err) = unit_exists(&review.unit_code, pooled) {
-        return Err(err);
+    match unit_exists(&review.unit_code, pooled) {
+        Ok(exists) => {
+            if !exists {
+                let response = ResponseMessage {
+                    message: Some(String::from("Unit does not exist.")),
+                };
+
+                return Err((Status::NotFound, Json(response)));
+            }
+        }
+        Err(err) => return Err(err),
     };
 
     // Check if user has already reviewed the unit
-    let review_count: i64 = match pooled.transaction(|c| {
+    match pooled.transaction(|c| {
         reviews::table
             .select(reviews::all_columns)
             .filter(reviews::unit_code.eq(&review.unit_code))
             .filter(reviews::user_id.eq(&review.user_id))
             .count()
-            .load(c)
+            .load::<i64>(c)
     }) {
-        Ok(review_count) => review_count[0],
+        Ok(review_count) => {
+            if review_count[0] > 0 {
+                let response = ResponseMessage {
+                    message: Some(String::from("Account has already review the desired unit")),
+                };
+                return Err((Status::Conflict, Json(response)));
+            }
+        }
         Err(err) => match err {
             _ => {
                 panic!("Database error - {}", err);
             }
         },
     };
-
-    if review_count > 0 {
-        let response = ResponseMessage {
-            message: Some(String::from("Account has already review the desired unit")),
-        };
-        return Err((Status::Conflict, Json(response)));
-    }
 
     let review = match pooled.transaction(|c| {
         diesel::insert_into(reviews::table)

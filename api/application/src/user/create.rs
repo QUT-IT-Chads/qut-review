@@ -5,6 +5,8 @@ use rocket::{http::Status, response::status::Created, serde::json::Json, State};
 use shared::response_models::ResponseMessage;
 use uuid::Uuid;
 
+use crate::database_helpers::user_exists;
+
 pub fn create_user(
     user: Json<LoginRequest>,
     state: &State<ServerState>,
@@ -18,28 +20,18 @@ pub fn create_user(
 
     let pooled = &mut state.db_pool.get().unwrap();
 
-    let user_count: i64 = match pooled.transaction(|c| {
-        users::table
-            .select(users::all_columns)
-            .filter(users::email.eq(&user.get_public().email))
-            .count()
-            .load(c)
-    }) {
-        Ok(user_count) => user_count[0],
-        Err(err) => match err {
-            _ => {
-                panic!("Database error - {}", err);
+    match user_exists(&user.get_public().email, pooled) {
+        Ok(exists) => {
+            if exists {
+                let response = ResponseMessage {
+                    message: Some(String::from("Email is already in use")),
+                };
+
+                return Err((Status::Conflict, Json(response)));
             }
-        },
+        }
+        Err(err) => return Err(err),
     };
-
-    if user_count > 0 {
-        let response = ResponseMessage {
-            message: Some(String::from("Email is already in use")),
-        };
-
-        return Err((Status::Conflict, Json(response)));
-    }
 
     let user: GetUser = match pooled.transaction(|c| {
         diesel::insert_into(users::table)

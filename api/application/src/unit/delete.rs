@@ -1,8 +1,9 @@
 use diesel::prelude::*;
-use domain::enums::role::Role;
 use infrastructure::ServerState;
 use rocket::{http::Status, serde::json::Json, State};
 use shared::{response_models::ResponseMessage, token::JWT};
+
+use crate::auth::has_admin_permissions;
 
 pub fn delete_unit(
     unit_code: &str,
@@ -11,12 +12,8 @@ pub fn delete_unit(
 ) -> Result<Json<ResponseMessage>, (Status, Json<ResponseMessage>)> {
     use domain::schema::units::dsl::{unit_code as db_unit_code, units};
 
-    if token.claims.role != Role::Admin {
-        let response = ResponseMessage {
-            message: Some(String::from("You do not have access to perform this action.")),
-        };
-
-        return Err((Status::Unauthorized, Json(response)));
+    if let Err(err) = has_admin_permissions(&token) {
+        return Err(err);
     }
 
     let pooled = &mut state.db_pool.get().unwrap();
@@ -26,9 +23,7 @@ pub fn delete_unit(
     {
         Ok(affected_count) => {
             if affected_count > 0 {
-                let response = ResponseMessage {
-                    message: None,
-                };
+                let response = ResponseMessage { message: None };
 
                 return Ok(Json(response));
             } else {

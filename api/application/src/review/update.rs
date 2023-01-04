@@ -1,6 +1,5 @@
 use diesel::prelude::*;
 use diesel::Connection;
-use domain::enums::role::Role;
 use domain::models::review::{NewReview, Review};
 use infrastructure::ServerState;
 use rocket::http::Status;
@@ -10,6 +9,9 @@ use rocket::State;
 use shared::response_models::ResponseMessage;
 use shared::token::JWT;
 
+use crate::auth::has_admin_permissions;
+use crate::auth::has_user_permissions;
+
 pub fn approve_review(
     review_id: i32,
     status: bool,
@@ -18,14 +20,8 @@ pub fn approve_review(
 ) -> Result<Json<Review>, (Status, Json<ResponseMessage>)> {
     use domain::schema::reviews::dsl::*;
 
-    if token.claims.role != Role::Admin {
-        let response = ResponseMessage {
-            message: Some(String::from(
-                "You do not have access to perform this action.",
-            )),
-        };
-
-        return Err((Status::Unauthorized, Json(response)));
+    if let Err(err) = has_admin_permissions(&token) {
+        return Err(err);
     }
 
     let pooled = &mut state.db_pool.get().unwrap();
@@ -82,14 +78,8 @@ pub fn update_review(
             },
         };
 
-    if token.claims.sub != db_review.user_id && token.claims.role != Role::Admin {
-        let response = ResponseMessage {
-            message: Some(String::from(
-                "You do not have access to perform this action.",
-            )),
-        };
-
-        return Err((Status::Unauthorized, Json(response)));
+    if let Err(err) = has_user_permissions(&token, &db_review.user_id) {
+        return Err(err);
     }
 
     match pooled.transaction(move |c| {

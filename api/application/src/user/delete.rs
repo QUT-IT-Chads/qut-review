@@ -1,9 +1,10 @@
 use diesel::prelude::*;
-use domain::enums::role::Role;
 use infrastructure::ServerState;
 use rocket::{http::Status, serde::json::Json, State};
 use shared::{response_models::ResponseMessage, token::JWT};
 use uuid::Uuid;
+
+use crate::auth::has_user_permissions;
 
 pub fn delete_user(
     user_id: Uuid,
@@ -12,12 +13,8 @@ pub fn delete_user(
 ) -> Result<Json<ResponseMessage>, (Status, Json<ResponseMessage>)> {
     use domain::schema::users::dsl::{id as db_user_id, users};
 
-    if token.claims.sub != user_id && token.claims.role != Role::Admin {
-        let response = ResponseMessage {
-            message: Some(String::from("You do not have access to perform this action.")),
-        };
-
-        return Err((Status::Unauthorized, Json(response)));
+    if let Err(err) = has_user_permissions(&token, &user_id) {
+        return Err(err);
     }
 
     let pooled = &mut state.db_pool.get().unwrap();
@@ -27,9 +24,7 @@ pub fn delete_user(
     {
         Ok(affected_count) => {
             if affected_count > 0 {
-                let response = ResponseMessage {
-                    message: None,
-                };
+                let response = ResponseMessage { message: None };
 
                 return Ok(Json(response));
             } else {
