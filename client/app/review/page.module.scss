@@ -1,0 +1,27 @@
+.container {
+    @apply flex flex-col items-center justify-start gap-16;
+    @apply w-full;
+    @apply px-0 py-52;
+}
+
+.heading {
+    @apply flex flex-col items-center justify-start gap-4;
+    @apply w-full;
+
+    h1 {
+        color: #245aac;
+        font-size: 48px;
+        font-weight: 600;
+    }
+
+    h2 {
+        color: #000;
+        font-size: 20px;
+        font-weight: 600;
+    }
+}
+
+.info {
+    @apply flex flex-col items-center justify-center;
+    @apply max-w-lg;
+}

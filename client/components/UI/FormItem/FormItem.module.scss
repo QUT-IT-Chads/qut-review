@@ -1,0 +1,21 @@
+.container {
+    @apply flex flex-col items-stretch justify-start gap-2;
+    @apply w-[30rem];
+
+    label {
+        @apply text-lg;
+        color: #6f7482;
+    }
+
+    input,
+    textarea {
+        @apply flex flex-col items-start;
+        @apply p-3;
+        @apply w-full;
+        background: #f8fafc;
+        border: 2px solid #dee6f0ba;
+        border-radius: 4px;
+
+        resize: none;
+    }
+}

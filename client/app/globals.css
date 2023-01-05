@@ -26,3 +26,13 @@ h1 {
     @apply text-4xl;
     font-weight: 600;
 }
+
+main {
+    /* Max width constraints for large screens */
+    @apply lg:max-w-7xl;
+}
+
+h1 {
+    @apply text-4xl;
+    font-weight: 600;
+}

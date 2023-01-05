@@ -1,0 +1,41 @@
+.group {
+    @apply flex flex-col items-center justify-start gap-8;
+    @apply w-full;
+}
+
+.control {
+    @apply w-full;
+    label {
+        @apply text-sm text-gray-700;
+    }
+
+    input,
+    textarea {
+        @apply flex flex-col items-start;
+        @apply gap-2 p-3;
+        @apply w-full;
+        background: #f8fafc;
+        border-radius: 4px;
+
+        flex: none;
+    }
+}
+
+.submitButton {
+    font-size: 1.2rem;
+    font-weight: 600;
+    background: #077aee;
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+
+    transition: background 0.2s ease-in-out;
+
+    &:hover {
+        background: #0756ac;
+        border: 1px solid #0a6ed6;
+    }
+}

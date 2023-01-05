@@ -2,7 +2,7 @@
 module.exports = {
     reactStrictMode: true,
     eslint: {
-        dirs: ['app', 'pages', 'components', 'types']
+        dirs: ['app', 'components', 'helper', 'types', 'pages']
     },
     experimental: {
         appDir: true
