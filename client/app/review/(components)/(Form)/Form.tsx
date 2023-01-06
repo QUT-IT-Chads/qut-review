@@ -1,162 +1,200 @@
 'use client';
-import { useReducer } from 'react';
-// import { useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
+import { useEffect, useState } from 'react';
 import styles from './Form.module.scss';
 
 import Numeric from '@components/UI/Numeric';
-import Select from '@components/UI/Selection';
+import Selection, { SelectOption } from '@components/UI/Selection';
 import Checkbox from '@components/UI/Checkbox';
 import TextArea from '@components/UI/TextArea';
 
-import { NewReview } from 'types/new_review';
-import { Unit } from 'types/unit';
-
-import { ActionType } from './FormReducer';
-import { FormContext, FormState } from './FormContext';
 import formHandler from './FormHandler';
+import FormState from './FormState';
+import { Semester } from 'types/semester';
+import { Validator } from '@helper/Validator';
 
-// import { ReviewValidator } from '@helper/Validator';
-import formReducer from './FormReducer';
+interface FormProps {
+    unitOptions: SelectOption[];
+}
 
-export default async function Form() {
-    const initialState = {
+export default function Form(props: FormProps) {
+    const [review, setReview] = useState<FormState>({
         unit: '',
-        teachingPeriod: 'Sem1',
+        semester: 'Sem1',
         year: new Date().getFullYear(),
         body: '',
         grade: 100,
         passed: true,
         rating: 5
-    } as FormState;
+    });
 
-    const [state, dispatch] = useReducer(formReducer, initialState);
+    const semesters = [
+        {
+            label: 'Semester 1',
+            value: 'Sem1' as Semester
+        },
+        {
+            label: 'Semester 2',
+            value: 'Sem2' as Semester
+        },
+        {
+            label: 'Summer',
+            value: 'Summer' as Semester
+        }
+    ];
 
-    // const searchParams = useSearchParams();
-    // useEffect(() => {
-    //     if (searchParams.has('code')) {
-    //         const code = searchParams.get('code');
-    //         if (code != null) {
-    //             if (ReviewValidator.isUnitValid(code, units)) {
-    //                 dispatch({
-    //                     type: ActionType.SET_UNIT,
-    //                     payload: code
-    //                 });
-    //             }
-    //         }
-    //     }
-    // }, []);
+    const searchParams = useSearchParams();
 
-    // useEffect(() => {
-    //     async function getUnits() {
-    //         const res = await fetch(`${process.env.API_URL}/unit`);
-    //         setUnits(await res.json());
-    //     }
-
-    //     getUnits();
-    // }, []);
-
-    // if (error) return <div>failed to load</div>;
-    // if (isLoading) return <div>loading...</div>;
-
-    // if (units === undefined) return <div>data error...</div>;
-
-    const units = [] as Unit[];
+    useEffect(() => {
+        if (searchParams.has('code')) {
+            const code = searchParams.get('code');
+            if (code != null) {
+                if (props.unitOptions.find((u) => u.value.toLowerCase() === code.toLowerCase())) {
+                    setReview({ ...review, unit: code });
+                }
+            }
+        }
+    }, []);
 
     return (
-        <FormContext.Provider value={{ state, dispatch }}>
-            <form className={styles.group}>
-                <Select
-                    label="Select a unit"
-                    id="reviewUnit"
-                    name="reviewUnit"
-                    options={units.map((unit) => {
-                        return {
-                            label: `${unit.unit_code} - ${unit.unit_name}`,
-                            value: unit.unit_code
-                        };
-                    })}
-                    value={units
-                        .filter((unit) => unit.unit_code === state.unit)
-                        .map((unit) => {
-                            return {
-                                label: `${unit.unit_code} - ${unit.unit_name}`,
-                                value: unit.unit_code
-                            };
-                        })}
+        <form
+            className={styles.group}
+            onSubmit={(e) => formHandler(e, review)}
+            id="review"
+        >
+            <Selection
+                label="Select a unit"
+                id="reviewUnit"
+                name="reviewUnit"
+                options={props.unitOptions}
+                value={props.unitOptions.find(
+                    (u) =>
+                        u.value.toLowerCase() === review.unit.toLowerCase()
+                ) as SelectOption}
+                required={true}
+                onChange={(newValue, actionMeta) => {
+                    if (actionMeta.action === 'select-option') {
+                        if (newValue !== null) {
+                            if (newValue.value !== null) {
+                                setReview({
+                                    ...review,
+                                    unit: newValue.value
+                                });
+                            }
+                        }
+                    }
+                }}
+            />
+            <div className={styles.split}>
+                <Selection
+                    label="Semester"
+                    id="reviewSemester"
+                    name="reviewSemester"
+                    options={semesters}
+                    defaultValue={semesters[0]}
                     required={true}
-                    onChange={(newValue) => {
-                        dispatch({
-                            type: ActionType.SET_UNIT,
-                            payload: newValue
-                        });
-                    }}
-                />
-                <TextArea
-                    label="Write a review"
-                    id="reviewBody"
-                    name="reviewBody"
-                    placeholder="Enter your review here..."
-                    required={true}
-                    onChange={(e) => {
-                        dispatch({
-                            type: ActionType.SET_BODY,
-                            payload: e.target.value
-                        });
+                    onChange={(newValue, actionMeta) => {
+                        if (actionMeta.action === 'select-option') {
+                            if (newValue !== null) {
+                                if (newValue.value !== null) {
+                                    setReview({
+                                        ...review,
+                                        semester: newValue.value as Semester
+                                    });
+                                }
+                            }
+                        }
                     }}
                 />
                 <Numeric
-                    label="Grade"
-                    id="reviewGrade"
-                    name="reviewGrade"
-                    placeholder={100}
-                    min={0}
-                    max={100}
+                    label="Year"
+                    id="reviewYear"
+                    name="reviewYear"
+                    placeholder={new Date().getFullYear()}
+                    value={review.year}
+                    min={2000}
+                    max={new Date().getFullYear()}
                     step={1}
-                    required={false}
-                    onChange={(e) => {
-                        dispatch({
-                            type: ActionType.SET_GRADE,
-                            payload: parseInt(e.target.value)
-                        });
-                    }}
-                />
-                <Checkbox
-                    label="Did you pass this unit?"
-                    id="reviewPassQ"
-                    name="reviewPassQ"
-                    value={state.passed}
                     required={true}
                     onChange={(e) => {
-                        dispatch({
-                            type: ActionType.SET_PASSED,
-                            payload: e.target.checked
+                        if (e.target.value === '') {
+                            setReview({ ...review, year: 2000 });
+                        } else if (
+                            Validator.isValidNumber(
+                                parseInt(e.target.value),
+                                2000,
+                                new Date().getFullYear(),
+                                1
+                            )
+                        ) {
+                            setReview({
+                                ...review,
+                                year: parseInt(e.target.value)
+                            });
+                        } else {
+                            console.log('Invalid year', e.target.value);
+                        }
+                    }}
+                />
+            </div>
+            <TextArea
+                label="Write a review"
+                id="reviewBody"
+                name="reviewBody"
+                value={review.body}
+                placeholder="Enter your review here..."
+                required={true}
+                onChange={(e) => setReview({ ...review, body: e.target.value })}
+            />
+            <Numeric
+                label="Grade"
+                id="reviewGrade"
+                name="reviewGrade"
+                placeholder={100}
+                value={review.grade}
+                min={0}
+                max={100}
+                step={1}
+                required={false}
+                onChange={(e) => {
+                    if (e.target.value === '') {
+                        setReview({ ...review, grade: 100 });
+                    } else if (
+                        Validator.isValidNumber(
+                            parseInt(e.target.value),
+                            0,
+                            100,
+                            1
+                        )
+                    ) {
+                        setReview({
+                            ...review,
+                            grade: parseInt(e.target.value)
                         });
-                    }}
-                />
-                <input
-                    id="reviewSubmit"
-                    type="submit"
-                    className={styles.submitButton}
-                    onClick={async (e) => {
-                        e.preventDefault();
-
-                        const review: NewReview = {
-                            unit_code: state.unit,
-                            review_body: state.body,
-                            teaching_period: state.teachingPeriod,
-                            year_taken: state.year,
-                            grade_achieved: state.grade,
-                            passed_unit: state.passed,
-                            rating: state.rating,
-                            user_id: '1'
-                        };
-
-                        await formHandler(review);
-                    }}
-                    value="Submit"
-                />
-            </form>
-        </FormContext.Provider>
+                    } else {
+                        console.log('Invalid grade', e.target.value);
+                    }
+                }}
+            />
+            <Checkbox
+                label="Did you pass this unit?"
+                id="reviewPassQ"
+                name="reviewPassQ"
+                value={review.passed}
+                required={true}
+                onChange={(e) =>
+                    setReview({ ...review, passed: e.target.checked })
+                }
+            />
+            <button
+                id="reviewSubmit"
+                type="submit"
+                className={styles.submitButton}
+                form="review"
+            >
+                Submit
+            </button>
+        </form>
     );
 }

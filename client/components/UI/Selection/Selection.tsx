@@ -1,12 +1,13 @@
 import FormItem, { FormItemProps } from '@components/UI/FormItem';
 import Select, {
+    ActionMeta,
     GroupBase,
-    InputActionMeta,
     Props,
-    PropsValue
-} from 'react-select';
+    PropsValue,
+    SingleValue
+} from 'react-select/';
 
-interface SelectOption {
+export interface SelectOption {
     label: string;
     value: string;
 }
@@ -20,9 +21,10 @@ function CustomSelect<
 
 interface SelectProps extends FormItemProps {
     name: string;
-    value: PropsValue<SelectOption>;
     options: SelectOption[];
-    onChange?: (newValue: string, actionMeta: InputActionMeta) => void;
+    value?: PropsValue<SelectOption>;
+    defaultValue?: PropsValue<SelectOption>;
+    onChange?: (newValue: SingleValue<SelectOption>, actionMeta: ActionMeta<SelectOption>) => void;
 }
 
 export default function Selection(props: SelectProps) {
@@ -30,9 +32,11 @@ export default function Selection(props: SelectProps) {
         <FormItem id={props.id} label={props.label} required={props.required}>
             <CustomSelect
                 id={props.id}
+                instanceId={props.id}
                 name={props.name}
                 value={props.value}
-                onInputChange={props.onChange}
+                defaultValue={props.defaultValue}
+                onChange={props.onChange}
                 options={props.options}
             />
         </FormItem>

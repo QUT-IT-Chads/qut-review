@@ -5,6 +5,7 @@ import FormItem, { FormItemProps } from '@components/UI/FormItem';
 interface NumericProps extends FormItemProps {
     name: string;
     placeholder: number;
+    value: number;
     onChange?: ChangeEventHandler<HTMLInputElement>;
     min: number;
     max: number;
@@ -19,6 +20,7 @@ export default function Numeric(props: NumericProps) {
                 id={props.id}
                 name={props.name}
                 placeholder={props.placeholder.toString()}
+                value={props.value}
                 onChange={props.onChange}
                 min={props.min}
                 max={props.max}

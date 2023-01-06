@@ -1,24 +1,12 @@
 .group {
     @apply flex flex-col items-center justify-start gap-8;
     @apply w-full;
+    @apply px-80;
 }
 
-.control {
+.split {
+    @apply flex flex-row items-center justify-between gap-8;
     @apply w-full;
-    label {
-        @apply text-sm text-gray-700;
-    }
-
-    input,
-    textarea {
-        @apply flex flex-col items-start;
-        @apply gap-2 p-3;
-        @apply w-full;
-        background: #f8fafc;
-        border-radius: 4px;
-
-        flex: none;
-    }
 }
 
 .submitButton {

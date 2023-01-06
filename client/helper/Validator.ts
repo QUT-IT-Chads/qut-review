@@ -1,4 +1,4 @@
-import { FormState } from 'app/review/(components)/(Form)/FormContext';
+import FormState from '@app/review/(components)/(Form)/FormState';
 import { Semester } from 'types/semester';
 import { Unit } from 'types/unit';
 
@@ -11,7 +11,7 @@ export abstract class Validator {
         max: number,
         step: number
     ): boolean {
-        return value >= min && value <= max && value % step === min;
+        return (min <= value) && (value <= max) && ((value - min) % step === 0);
     }
 
     public static isValidYear(value: number): boolean {
