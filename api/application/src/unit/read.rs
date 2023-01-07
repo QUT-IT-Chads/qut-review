@@ -1,44 +1,50 @@
+use crate::response_models::ResponseMessage;
 use diesel::prelude::*;
+use diesel::r2d2::{ConnectionManager, PooledConnection};
 use domain::models::unit::Unit;
+use infrastructure::unit::read::{db_read_unit, db_read_units};
 use infrastructure::ServerState;
 use rocket::{http::Status, serde::json::Json, State};
-use shared::response_models::ResponseMessage;
 
 pub fn list_unit(
     unit_code: &str,
     state: &State<ServerState>,
-) -> Result<Json<Unit>, (Status, Json<ResponseMessage>)> {
+) -> Result<Unit, (Status, Option<String>)> {
+    db_read_unit(unit_code, state)
+}
+
+pub fn list_units(state: &State<ServerState>) -> Result<Vec<Unit>, (Status, Option<String>)> {
+    db_read_units(state)
+}
+
+pub fn unit_exists(
+    unit_code: &String,
+    pooled: &mut PooledConnection<ConnectionManager<PgConnection>>,
+) -> Result<bool, (Status, Json<ResponseMessage>)> {
     use domain::schema::units;
 
-    let pooled = &mut state.db_pool.get().unwrap();
+    match pooled.transaction(move |c| {
+        units::table
+            .select(units::all_columns)
+            .filter(units::unit_code.eq(&unit_code))
+            .count()
+            .load::<i64>(c)
+    }) {
+        Ok(unit_count) => {
+            if unit_count[0] == 0 {
+                return Ok(false);
+            }
 
-    match pooled.transaction(move |c| units::table.find(unit_code).first::<Unit>(c)) {
-        Ok(unit) => {
-            return Ok(Json(unit));
+            Ok(true)
         }
         Err(err) => match err {
             diesel::result::Error::NotFound => {
                 let response = ResponseMessage {
-                    message: Some(format!("The unit '{}' could not found", unit_code)),
+                    message: Some(String::from("Unit does not exist.")),
                 };
 
                 return Err((Status::NotFound, Json(response)));
             }
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
-    }
-}
-
-pub fn list_units(state: &State<ServerState>) -> Json<Vec<Unit>> {
-    use domain::schema::units;
-
-    let pooled = &mut state.db_pool.get().unwrap();
-
-    match pooled.transaction(move |c| units::table.load::<Unit>(c)) {
-        Ok(units) => Json(units),
-        Err(err) => match err {
             _ => {
                 panic!("Database error - {}", err);
             }

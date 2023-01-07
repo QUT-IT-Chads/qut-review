@@ -1,3 +1,7 @@
+pub mod unit;
+pub mod review;
+pub mod user;
+
 use std::env;
 
 use diesel::{

@@ -1,8 +1,11 @@
-use diesel::prelude::*;
-use domain::models::user::{GetUser, User};
-use infrastructure::ServerState;
+use crate::{response_models::ResponseMessage, token::JWT};
+use diesel::{
+    prelude::*,
+    r2d2::{ConnectionManager, PooledConnection},
+};
+use domain::models::user::GetUser;
+use infrastructure::{user::read::db_read_user, ServerState};
 use rocket::{http::Status, serde::json::Json, State};
-use shared::{response_models::ResponseMessage, token::JWT};
 use uuid::Uuid;
 
 use crate::auth::has_user_permissions;
@@ -11,27 +14,33 @@ pub fn list_user(
     user_id: Uuid,
     state: &State<ServerState>,
     token: JWT,
-) -> Result<Json<GetUser>, (Status, Json<ResponseMessage>)> {
+) -> Result<GetUser, (Status, Option<String>)> {
+    has_user_permissions(&token, &user_id)?;
+
+    db_read_user(&user_id, state)
+}
+
+pub fn user_exists(
+    user_email: &String,
+    pooled: &mut PooledConnection<ConnectionManager<PgConnection>>,
+) -> Result<bool, (Status, Json<ResponseMessage>)> {
     use domain::schema::users;
 
-    if let Err(err) = has_user_permissions(&token, &user_id) {
-        return Err(err);
-    }
+    match pooled.transaction(move |c| {
+        users::table
+            .select(users::all_columns)
+            .filter(users::email.eq(&user_email))
+            .count()
+            .load::<i64>(c)
+    }) {
+        Ok(user_count) => {
+            if user_count[0] == 0 {
+                return Ok(false);
+            }
 
-    let pooled = &mut state.db_pool.get().unwrap();
-
-    match pooled.transaction(move |c| users::table.find(user_id).first::<User>(c)) {
-        Ok(user) => {
-            return Ok(Json(user.get_public()));
+            Ok(true)
         }
         Err(err) => match err {
-            diesel::result::Error::NotFound => {
-                let response = ResponseMessage {
-                    message: Some(String::from("User could not be found.")),
-                };
-
-                return Err((Status::NotFound, Json(response)));
-            }
             _ => {
                 panic!("Database error - {}", err);
             }
