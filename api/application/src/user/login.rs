@@ -1,11 +1,11 @@
 use crate::token::create_jwt;
 use domain::models::user::LoginRequest;
 use infrastructure::{user::read::db_login_request, ServerState};
-use rocket::{http::Status, State};
+use rocket::http::Status;
 
 pub fn login_user(
     user: LoginRequest,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<String, (Status, Option<String>)> {
     let user = db_login_request(&user.email, &user.hashed_password, state)?;
 

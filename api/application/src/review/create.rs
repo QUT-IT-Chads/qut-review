@@ -3,13 +3,13 @@ use domain::models::review::{NewReview, Review};
 use infrastructure::review::create::{db_has_user_reviewed_unit, db_insert_review};
 use infrastructure::review::read::db_does_unit_exist;
 use infrastructure::ServerState;
-use rocket::{http::Status, State};
+use rocket::http::Status;
 
 use crate::auth::has_user_permissions;
 
 pub fn create_review(
     review: NewReview,
-    state: &State<ServerState>,
+    state: &ServerState,
     token: JWT,
 ) -> Result<Review, (Status, Option<String>)> {
     has_user_permissions(&token, &review.user_id)?;

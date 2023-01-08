@@ -1,12 +1,12 @@
 use crate::ServerState;
 use diesel::prelude::*;
 use domain::models::review::Review;
-use rocket::{http::Status, State};
+use rocket::http::Status;
 use uuid::Uuid;
 
 pub fn db_does_unit_exist(
     unit_code: &String,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<bool, (Status, Option<String>)> {
     use domain::schema::units;
 
@@ -37,10 +37,9 @@ pub fn db_does_unit_exist(
     }
 }
 
-
 pub fn db_read_user_reviews(
     user_id: Uuid,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<Vec<Review>, (Status, Option<String>)> {
     use domain::schema::reviews::{self, user_id as db_user_id};
 
@@ -65,7 +64,7 @@ pub fn db_read_user_reviews(
 
 pub fn db_read_review(
     review_id: i32,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<Review, (Status, Option<String>)> {
     use domain::schema::reviews;
 
@@ -92,7 +91,7 @@ pub fn db_read_review(
 pub fn db_read_reviews_paginated(
     _page: i64,
     _limit: i64,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<Vec<Review>, (Status, Option<String>)> {
     use domain::schema::reviews;
 
@@ -113,9 +112,7 @@ pub fn db_read_reviews_paginated(
     }
 }
 
-pub fn db_read_reviews(
-    state: &State<ServerState>,
-) -> Result<Vec<Review>, (Status, Option<String>)> {
+pub fn db_read_reviews(state: &ServerState) -> Result<Vec<Review>, (Status, Option<String>)> {
     use domain::schema::reviews;
 
     let pooled = &mut state.db_pool.get().unwrap();
@@ -134,7 +131,7 @@ pub fn db_read_unit_reviews_paginated(
     unit_code: String,
     _page: i64,
     _limit: i64,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<Vec<Review>, (Status, Option<String>)> {
     use domain::schema::reviews::{self, unit_code as db_unit_code};
 
@@ -159,7 +156,7 @@ pub fn db_read_unit_reviews_paginated(
 
 pub fn db_read_unit_reviews(
     unit_code: String,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<Vec<Review>, (Status, Option<String>)> {
     use domain::schema::reviews::{self, unit_code as db_unit_code};
 

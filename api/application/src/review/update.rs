@@ -5,7 +5,6 @@ use infrastructure::review::update::db_update_review;
 use infrastructure::review::update::db_update_review_status;
 use infrastructure::ServerState;
 use rocket::http::Status;
-use rocket::State;
 
 use crate::auth::has_admin_permissions;
 use crate::auth::has_user_permissions;
@@ -13,7 +12,7 @@ use crate::auth::has_user_permissions;
 pub fn approve_review(
     review_id: i32,
     status: bool,
-    state: &State<ServerState>,
+    state: &ServerState,
     token: JWT,
 ) -> Result<Review, (Status, Option<String>)> {
     has_admin_permissions(&token)?;
@@ -24,7 +23,7 @@ pub fn approve_review(
 pub fn update_review(
     review_id: i32,
     review: NewReview,
-    state: &State<ServerState>,
+    state: &ServerState,
     token: JWT,
 ) -> Result<Review, (Status, Option<String>)> {
     let db_review = db_read_review(review_id, state)?;

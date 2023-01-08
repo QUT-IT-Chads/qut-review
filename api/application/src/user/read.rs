@@ -5,14 +5,14 @@ use diesel::{
 };
 use domain::models::user::GetUser;
 use infrastructure::{user::read::db_read_user, ServerState};
-use rocket::{http::Status, serde::json::Json, State};
+use rocket::{http::Status, serde::json::Json};
 use uuid::Uuid;
 
 use crate::auth::has_user_permissions;
 
 pub fn list_user(
     user_id: Uuid,
-    state: &State<ServerState>,
+    state: &ServerState,
     token: JWT,
 ) -> Result<GetUser, (Status, Option<String>)> {
     has_user_permissions(&token, &user_id)?;

@@ -6,12 +6,12 @@ use infrastructure::{
     },
     ServerState,
 };
-use rocket::{http::Status, State};
+use rocket::http::Status;
 use uuid::Uuid;
 
 pub fn list_review(
     review_id: i32,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<Review, (Status, Option<String>)> {
     db_read_review(review_id, state)
 }
@@ -19,7 +19,7 @@ pub fn list_review(
 pub fn list_reviews(
     _page: Option<i64>,
     _limit: Option<i64>,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<Vec<Review>, (Status, Option<String>)> {
     // Return paginated reviews
     if let (Some(page), Some(limit)) = (_page, _limit) {
@@ -34,7 +34,7 @@ pub fn list_unit_reviews(
     unit_code: String,
     _page: Option<i64>,
     _limit: Option<i64>,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<Vec<Review>, (Status, Option<String>)> {
     // Return paginated reviews
     if let (Some(page), Some(limit)) = (_page, _limit) {
@@ -47,7 +47,7 @@ pub fn list_unit_reviews(
 
 pub fn list_user_reviews(
     user_id: Uuid,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<Vec<Review>, (Status, Option<String>)> {
     db_read_user_reviews(user_id, state)
 }

@@ -33,6 +33,8 @@ pub fn list_reviews_handler(
     _limit: Option<i64>,
     state: &State<ServerState>,
 ) -> Result<Json<Vec<Review>>, (Status, Json<ResponseMessage>)> {
+    let state = state.inner();
+
     match read::list_reviews(_page, _limit, state) {
         Ok(reviews) => Ok(Json(reviews)),
         Err(err) => {
@@ -51,6 +53,8 @@ pub fn list_unit_reviews_handler(
     _limit: Option<i64>,
     state: &State<ServerState>,
 ) -> Result<Json<Vec<Review>>, (Status, Json<ResponseMessage>)> {
+    let state = state.inner();
+
     match read::list_unit_reviews(unit_code, _page, _limit, state) {
         Ok(reviews) => Ok(Json(reviews)),
         Err(err) => {
@@ -67,6 +71,8 @@ pub fn list_review_handler(
     review_id: i32,
     state: &State<ServerState>,
 ) -> Result<Json<Review>, (Status, Json<ResponseMessage>)> {
+    let state = state.inner();
+
     match read::list_review(review_id, state) {
         Ok(review) => Ok(Json(review)),
         Err(err) => {
@@ -83,6 +89,8 @@ pub fn list_user_reviews_handler(
     user_id: Uuid,
     state: &State<ServerState>,
 ) -> Result<Json<Vec<Review>>, (Status, Json<ResponseMessage>)> {
+    let state = state.inner();
+
     match read::list_user_reviews(user_id, state) {
         Ok(reviews) => Ok(Json(reviews)),
         Err(err) => {
@@ -101,6 +109,7 @@ pub fn create_review_handler(
     token: Result<JWT, (Status, Json<ResponseMessage>)>,
 ) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
     let token = token?;
+    let state = state.inner();
 
     match create::create_review(review.into_inner(), state, token) {
         Ok(review) => Ok(Created::new("").tagged_body(
@@ -123,6 +132,7 @@ pub fn approve_review_handler(
     token: Result<JWT, (Status, Json<ResponseMessage>)>,
 ) -> Result<Json<Review>, (Status, Json<ResponseMessage>)> {
     let token = token?;
+    let state = state.inner();
 
     match update::approve_review(review_id, status.unwrap_or(true), state, token) {
         Ok(review) => Ok(Json(review)),
@@ -142,6 +152,7 @@ pub fn delete_review_handler(
     token: Result<JWT, (Status, Json<ResponseMessage>)>,
 ) -> Result<Json<ResponseMessage>, (Status, Json<ResponseMessage>)> {
     let token = token?;
+    let state = state.inner();
 
     match delete::delete_review(review_id, state, token) {
         Ok(message) => {
@@ -165,6 +176,7 @@ pub fn update_review_handler(
     token: Result<JWT, (Status, Json<ResponseMessage>)>,
 ) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
     let token = token?;
+    let state = state.inner();
 
     let review = review.into_inner();
 

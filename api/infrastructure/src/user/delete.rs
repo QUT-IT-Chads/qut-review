@@ -1,11 +1,11 @@
 use crate::ServerState;
 use diesel::prelude::*;
-use rocket::{http::Status, State};
+use rocket::http::Status;
 use uuid::Uuid;
 
 pub fn db_delete_user(
     user_id: &Uuid,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<Option<String>, (Status, Option<String>)> {
     use domain::schema::users::dsl::{id as db_user_id, users};
 

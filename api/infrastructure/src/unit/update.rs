@@ -1,12 +1,12 @@
 use crate::ServerState;
 use diesel::prelude::*;
 use domain::models::unit::Unit;
-use rocket::{http::Status, State};
+use rocket::http::Status;
 
 pub fn db_update_unit(
     unit_code: &str,
     unit: Unit,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<Unit, (Status, Option<String>)> {
     use domain::schema::units::dsl::units;
 

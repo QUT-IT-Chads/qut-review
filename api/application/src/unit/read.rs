@@ -4,16 +4,13 @@ use diesel::r2d2::{ConnectionManager, PooledConnection};
 use domain::models::unit::Unit;
 use infrastructure::unit::read::{db_read_unit, db_read_units};
 use infrastructure::ServerState;
-use rocket::{http::Status, serde::json::Json, State};
+use rocket::{http::Status, serde::json::Json};
 
-pub fn list_unit(
-    unit_code: &str,
-    state: &State<ServerState>,
-) -> Result<Unit, (Status, Option<String>)> {
+pub fn list_unit(unit_code: &str, state: &ServerState) -> Result<Unit, (Status, Option<String>)> {
     db_read_unit(unit_code, state)
 }
 
-pub fn list_units(state: &State<ServerState>) -> Result<Vec<Unit>, (Status, Option<String>)> {
+pub fn list_units(state: &ServerState) -> Result<Vec<Unit>, (Status, Option<String>)> {
     db_read_units(state)
 }
 

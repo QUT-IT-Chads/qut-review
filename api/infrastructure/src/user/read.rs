@@ -1,12 +1,12 @@
 use crate::ServerState;
 use diesel::prelude::*;
 use domain::models::user::{GetUser, User};
-use rocket::{http::Status, State};
+use rocket::http::Status;
 use uuid::Uuid;
 
 pub fn db_read_user(
     user_id: &Uuid,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<GetUser, (Status, Option<String>)> {
     use domain::schema::users;
 
@@ -33,7 +33,7 @@ pub fn db_read_user(
 pub fn db_login_request(
     user_email: &String,
     user_hashed_password: &String,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<GetUser, (Status, Option<String>)> {
     use domain::schema::users;
 
@@ -63,7 +63,7 @@ pub fn db_login_request(
 
 pub fn db_does_user_exist(
     user_email: &String,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<bool, (Status, Option<String>)> {
     use domain::schema::users;
 

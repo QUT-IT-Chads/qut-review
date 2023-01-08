@@ -5,7 +5,6 @@ use domain::models::user::UpdateUser;
 use infrastructure::user::update::db_update_user;
 use infrastructure::ServerState;
 use rocket::http::Status;
-use rocket::State;
 use uuid::Uuid;
 
 use crate::auth::has_user_permissions;
@@ -13,7 +12,7 @@ use crate::auth::has_user_permissions;
 pub fn update_user(
     user_id: Uuid,
     user: UpdateUser,
-    state: &State<ServerState>,
+    state: &ServerState,
     token: JWT,
 ) -> Result<GetUser, (Status, Option<String>)> {
     has_user_permissions(&token, &user_id)?;

@@ -1,13 +1,13 @@
 use crate::ServerState;
 use diesel::prelude::*;
 use domain::models::user::{GetUser, UpdateUser, User};
-use rocket::{http::Status, State};
+use rocket::http::Status;
 use uuid::Uuid;
 
 pub fn db_update_user(
     user: UpdateUser,
     user_id: Uuid,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<GetUser, (Status, Option<String>)> {
     use domain::schema::users::dsl::users;
 

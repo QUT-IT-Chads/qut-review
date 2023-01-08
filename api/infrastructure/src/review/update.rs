@@ -1,12 +1,12 @@
 use crate::ServerState;
 use diesel::prelude::*;
 use domain::models::review::{NewReview, Review};
-use rocket::{http::Status, State};
+use rocket::http::Status;
 
 pub fn db_update_review_status(
     status: bool,
     review_id: i32,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<Review, (Status, Option<String>)> {
     use domain::schema::reviews::dsl::*;
 
@@ -37,7 +37,7 @@ pub fn db_update_review_status(
 pub fn db_update_review(
     review_id: i32,
     review: NewReview,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<Review, (Status, Option<String>)> {
     use domain::schema::reviews::dsl::*;
 

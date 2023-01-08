@@ -27,6 +27,8 @@ pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, O
 pub fn list_units_handler(
     state: &State<ServerState>,
 ) -> Result<Json<Vec<Unit>>, (Status, Json<ResponseMessage>)> {
+    let state = state.inner();
+
     match read::list_units(state) {
         Ok(units) => Ok(Json(units)),
         Err(err) => {
@@ -43,6 +45,8 @@ pub fn list_unit_handler(
     unit_code: &str,
     state: &State<ServerState>,
 ) -> Result<Json<Unit>, (Status, Json<ResponseMessage>)> {
+    let state = state.inner();
+
     match read::list_unit(unit_code, state) {
         Ok(unit) => Ok(Json(unit)),
         Err(err) => {
@@ -61,8 +65,8 @@ pub fn create_unit_handler(
     token: Result<JWT, (Status, Json<ResponseMessage>)>,
 ) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
     let token = token?;
-
     let unit = unit.into_inner();
+    let state = state.inner();
 
     match create::create_unit(unit, state, token) {
         Ok(unit) => Ok(Created::new("")
@@ -83,6 +87,7 @@ pub fn delete_unit_handler(
     token: Result<JWT, (Status, Json<ResponseMessage>)>,
 ) -> Result<Json<ResponseMessage>, (Status, Json<ResponseMessage>)> {
     let token = token?;
+    let state = state.inner();
 
     match delete::delete_unit(unit_code, state, token) {
         Ok(message) => {
@@ -106,7 +111,7 @@ pub fn update_unit_handler(
     token: Result<JWT, (Status, Json<ResponseMessage>)>,
 ) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
     let token = token?;
-
+    let state = state.inner();
     let unit = unit.into_inner();
 
     match update::update_unit(unit_code, unit, state, token) {
@@ -117,5 +122,4 @@ pub fn update_unit_handler(
             Err((err.0, Json(response)))
         }
     }
-
 }

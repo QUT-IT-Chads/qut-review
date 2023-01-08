@@ -1,11 +1,11 @@
 use crate::ServerState;
 use diesel::prelude::*;
 use domain::models::user::{GetUser, User};
-use rocket::{http::Status, State};
+use rocket::http::Status;
 
 pub fn db_insert_user(
     user: User,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<GetUser, (Status, Option<String>)> {
     use domain::schema::users;
 

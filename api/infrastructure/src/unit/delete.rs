@@ -1,10 +1,10 @@
 use crate::ServerState;
 use diesel::prelude::*;
-use rocket::{http::Status, State};
+use rocket::http::Status;
 
 pub fn db_delete_unit(
     unit_code: &str,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<Option<String>, (Status, Option<String>)> {
     use domain::schema::units::dsl::{unit_code as db_unit_code, units};
 

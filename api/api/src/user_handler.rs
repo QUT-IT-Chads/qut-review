@@ -30,6 +30,7 @@ pub fn create_user_handler(
     state: &State<ServerState>,
 ) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
     let user = user.into_inner();
+    let state = state.inner();
 
     match create::create_user(user, state) {
         Ok(user) => Ok(Created::new("")
@@ -50,6 +51,7 @@ pub fn list_user_handler(
     token: Result<JWT, (Status, Json<ResponseMessage>)>,
 ) -> Result<Json<GetUser>, (Status, Json<ResponseMessage>)> {
     let token = token?;
+    let state = state.inner();
 
     match read::list_user(user_id, state, token) {
         Ok(user) => Ok(Json(user)),
@@ -69,6 +71,7 @@ pub fn delete_user_handler(
     token: Result<JWT, (Status, Json<ResponseMessage>)>,
 ) -> Result<Json<ResponseMessage>, (Status, Json<ResponseMessage>)> {
     let token = token?;
+    let state = state.inner();
 
     match delete::delete_user(user_id, state, token) {
         Ok(message) => {
@@ -92,7 +95,7 @@ pub fn update_user_handler(
     token: Result<JWT, (Status, Json<ResponseMessage>)>,
 ) -> Result<Created<String>, (Status, Json<ResponseMessage>)> {
     let token = token?;
-
+    let state = state.inner();
     let user = user.into_inner();
 
     match update::update_user(user_id, user, state, token) {
@@ -113,6 +116,7 @@ pub fn login_user_handler(
     state: &State<ServerState>,
 ) -> Result<Json<AuthToken>, (Status, Json<ResponseMessage>)> {
     let user = user.into_inner();
+    let state = state.inner();
 
     match login::login_user(user, state) {
         Ok(token) => {

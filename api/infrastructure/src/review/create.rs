@@ -1,13 +1,13 @@
 use crate::ServerState;
 use diesel::prelude::*;
-use domain::models::review::{Review, NewReview};
-use rocket::{http::Status, State};
+use domain::models::review::{NewReview, Review};
+use rocket::http::Status;
 use uuid::Uuid;
 
 pub fn db_has_user_reviewed_unit(
     unit_code: &str,
     user_id: &Uuid,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<bool, (Status, Option<String>)> {
     use domain::schema::reviews;
 
@@ -38,7 +38,7 @@ pub fn db_has_user_reviewed_unit(
 
 pub fn db_insert_review(
     review: NewReview,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<Review, (Status, Option<String>)> {
     use domain::schema::reviews;
 

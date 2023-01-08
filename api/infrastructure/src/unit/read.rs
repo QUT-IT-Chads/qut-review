@@ -5,7 +5,7 @@ use rocket::{http::Status, State};
 
 pub fn db_read_unit(
     unit_code: &str,
-    state: &State<ServerState>,
+    state: &ServerState,
 ) -> Result<Unit, (Status, Option<String>)> {
     use domain::schema::units;
 
@@ -28,7 +28,7 @@ pub fn db_read_unit(
     }
 }
 
-pub fn db_read_units(state: &State<ServerState>) -> Result<Vec<Unit>, (Status, Option<String>)> {
+pub fn db_read_units(state: &ServerState) -> Result<Vec<Unit>, (Status, Option<String>)> {
     use domain::schema::units;
 
     let pooled = &mut state.db_pool.get().unwrap();
