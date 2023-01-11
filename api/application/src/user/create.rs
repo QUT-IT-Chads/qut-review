@@ -13,17 +13,12 @@ pub fn create_user(
     let id = Uuid::new_v4();
     let user = User::new(id, user.into());
 
-    match db_does_user_exist(&user.get_public().email, &state) {
-        Ok(exists) => {
-            if exists {
-                return Err((
-                    Status::Conflict,
-                    Some(String::from("Email is already in use")),
-                ));
-            }
-        }
-        Err(err) => return Err(err),
-    };
+    if db_does_user_exist(&user.get_public().email, state)? {
+        return Err((
+            Status::Conflict,
+            Some(String::from("Email is already in use")),
+        ));
+    }
 
-    db_insert_user(user, &state)
+    db_insert_user(user, state)
 }

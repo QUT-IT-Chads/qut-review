@@ -27,24 +27,13 @@ pub fn unit_exists(
             .count()
             .load::<i64>(c)
     }) {
-        Ok(unit_count) => {
-            if unit_count[0] == 0 {
-                return Ok(false);
-            }
-
-            Ok(true)
-        }
-        Err(err) => match err {
-            diesel::result::Error::NotFound => {
-                let response = ResponseMessage {
-                    message: Some(String::from("Unit does not exist.")),
-                };
-
-                return Err((Status::NotFound, Json(response)));
-            }
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
+        Ok(unit_count) => Ok(unit_count[0] != 0),
+        Err(diesel::result::Error::NotFound) => Err((
+            Status::NotFound,
+            Json(ResponseMessage {
+                message: Some(String::from("Unit does not exist.")),
+            }),
+        )),
+        Err(err) => panic!("Database error - {}", err),
     }
 }

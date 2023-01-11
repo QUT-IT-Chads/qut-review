@@ -13,27 +13,18 @@ pub fn db_has_user_reviewed_unit(
 
     let pooled = &mut state.db_pool.get().unwrap();
 
-    match pooled.transaction(move |c| {
-        reviews::table
-            .select(reviews::all_columns)
-            .filter(reviews::unit_code.eq(&unit_code))
-            .filter(reviews::user_id.eq(&user_id))
-            .count()
-            .load::<i64>(c)
-    }) {
-        Ok(review_count) => {
-            if review_count[0] > 0 {
-                return Ok(true);
-            }
+    let review_count = pooled
+        .transaction(move |c| {
+            reviews::table
+                .select(reviews::all_columns)
+                .filter(reviews::unit_code.eq(&unit_code))
+                .filter(reviews::user_id.eq(&user_id))
+                .count()
+                .load::<i64>(c)
+        })
+        .expect("Database error");
 
-            Ok(false)
-        }
-        Err(err) => match err {
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
-    }
+    Ok(review_count[0] > 0)
 }
 
 pub fn db_insert_review(
@@ -44,16 +35,13 @@ pub fn db_insert_review(
 
     let pooled = &mut state.db_pool.get().unwrap();
 
-    match pooled.transaction(move |c| {
-        diesel::insert_into(reviews::table)
-            .values(&review)
-            .get_result::<Review>(c)
-    }) {
-        Ok(review) => Ok(review),
-        Err(err) => match err {
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
-    }
+    let review = pooled
+        .transaction(move |c| {
+            diesel::insert_into(reviews::table)
+                .values(&review)
+                .get_result::<Review>(c)
+        })
+        .expect("Database error");
+
+    Ok(review)
 }

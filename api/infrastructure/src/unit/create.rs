@@ -8,16 +8,13 @@ pub fn db_insert_unit(unit: Unit, state: &ServerState) -> Result<Unit, (Status, 
 
     let pooled = &mut state.db_pool.get().unwrap();
 
-    match pooled.transaction(move |c| {
-        diesel::insert_into(units::table)
-            .values(&unit)
-            .get_result::<Unit>(c)
-    }) {
-        Ok(unit) => Ok(unit),
-        Err(err) => match err {
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
-    }
+    let unit = pooled
+        .transaction(move |c| {
+            diesel::insert_into(units::table)
+                .values(&unit)
+                .get_result::<Unit>(c)
+        })
+        .expect("Database error");
+
+    Ok(unit)
 }

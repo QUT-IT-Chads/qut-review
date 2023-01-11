@@ -1,4 +1,4 @@
-use crate::ServerState;
+use crate::{review, ServerState};
 use diesel::prelude::*;
 use domain::models::review::Review;
 use rocket::http::Status;
@@ -45,21 +45,16 @@ pub fn db_read_user_reviews(
 
     let pooled = &mut state.db_pool.get().unwrap();
 
-    match pooled.transaction(move |c| {
-        reviews::table
-            .select(reviews::all_columns)
-            .filter(db_user_id.eq(user_id))
-            .load::<Review>(c)
-    }) {
-        Ok(reviews) => {
-            return Ok(reviews);
-        }
-        Err(err) => match err {
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
-    }
+    let reviews = pooled
+        .transaction(move |c| {
+            reviews::table
+                .select(reviews::all_columns)
+                .filter(db_user_id.eq(user_id))
+                .load::<Review>(c)
+        })
+        .expect("Database error");
+
+    Ok(reviews)
 }
 
 pub fn db_read_review(
@@ -71,20 +66,12 @@ pub fn db_read_review(
     let pooled = &mut state.db_pool.get().unwrap();
 
     match pooled.transaction(move |c| reviews::table.find(review_id).first::<Review>(c)) {
-        Ok(review) => {
-            return Ok(review);
-        }
-        Err(err) => match err {
-            diesel::result::Error::NotFound => {
-                return Err((
-                    Status::NotFound,
-                    Some(String::from("Review could not be found")),
-                ));
-            }
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
+        Ok(review) => Ok(review),
+        Err(diesel::result::Error::NotFound) => Err((
+            Status::NotFound,
+            Some(String::from("Review could not be found")),
+        )),
+        Err(err) => panic!("Database error - {}", err),
     }
 }
 
@@ -97,19 +84,16 @@ pub fn db_read_reviews_paginated(
 
     let pooled = &mut state.db_pool.get().unwrap();
 
-    match pooled.transaction(move |c| {
-        reviews::table
-            .limit(_limit)
-            .offset(_page * _limit)
-            .load::<Review>(c)
-    }) {
-        Ok(reviews) => Ok(reviews),
-        Err(err) => match err {
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
-    }
+    let reviews = pooled
+        .transaction(move |c| {
+            reviews::table
+                .limit(_limit)
+                .offset(_page * _limit)
+                .load::<Review>(c)
+        })
+        .expect("Database error");
+
+    Ok(reviews)
 }
 
 pub fn db_read_reviews(state: &ServerState) -> Result<Vec<Review>, (Status, Option<String>)> {
@@ -117,14 +101,11 @@ pub fn db_read_reviews(state: &ServerState) -> Result<Vec<Review>, (Status, Opti
 
     let pooled = &mut state.db_pool.get().unwrap();
 
-    match pooled.transaction(move |c| reviews::table.load::<Review>(c)) {
-        Ok(reviews) => Ok(reviews),
-        Err(err) => match err {
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
-    }
+    let reviews = pooled
+        .transaction(move |c| reviews::table.load::<Review>(c))
+        .expect("Database error");
+
+    Ok(reviews)
 }
 
 pub fn db_read_unit_reviews_paginated(
@@ -137,21 +118,18 @@ pub fn db_read_unit_reviews_paginated(
 
     let pooled = &mut state.db_pool.get().unwrap();
 
-    match pooled.transaction(move |c| {
-        reviews::table
-            .select(reviews::all_columns)
-            .filter(db_unit_code.eq(unit_code))
-            .limit(_limit)
-            .offset(_page * _limit)
-            .load::<Review>(c)
-    }) {
-        Ok(reviews) => Ok(reviews),
-        Err(err) => match err {
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
-    }
+    let reviews = pooled
+        .transaction(move |c| {
+            reviews::table
+                .select(reviews::all_columns)
+                .filter(db_unit_code.eq(unit_code))
+                .limit(_limit)
+                .offset(_page * _limit)
+                .load::<Review>(c)
+        })
+        .expect("Database error");
+
+    Ok(reviews)
 }
 
 pub fn db_read_unit_reviews(
@@ -162,17 +140,14 @@ pub fn db_read_unit_reviews(
 
     let pooled = &mut state.db_pool.get().unwrap();
 
-    match pooled.transaction(move |c| {
-        reviews::table
-            .select(reviews::all_columns)
-            .filter(db_unit_code.eq(unit_code))
-            .load::<Review>(c)
-    }) {
-        Ok(reviews) => Ok(reviews),
-        Err(err) => match err {
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
-    }
+    let reviews = pooled
+        .transaction(move |c| {
+            reviews::table
+                .select(reviews::all_columns)
+                .filter(db_unit_code.eq(unit_code))
+                .load::<Review>(c)
+        })
+        .expect("Database error");
+
+    Ok(reviews)
 }

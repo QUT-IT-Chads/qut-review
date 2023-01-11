@@ -10,23 +10,16 @@ pub fn db_delete_unit(
 
     let pooled = &mut state.db_pool.get().unwrap();
 
-    match pooled
+    let affected_count = pooled
         .transaction(move |c| diesel::delete(units.filter(db_unit_code.eq(unit_code))).execute(c))
-    {
-        Ok(affected_count) => {
-            if affected_count > 0 {
-                return Ok(None);
-            } else {
-                return Err((
-                    Status::NotFound,
-                    Some(format!("The unit '{}' could not found", unit_code)),
-                ));
-            }
-        }
-        Err(err) => match err {
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
+        .expect("Database error");
+
+    if affected_count > 0 {
+        Ok(None)
+    } else {
+        Err((
+            Status::NotFound,
+            Some(format!("The unit '{}' could not found", unit_code)),
+        ))
     }
 }

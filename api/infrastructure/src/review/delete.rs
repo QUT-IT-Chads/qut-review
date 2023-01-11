@@ -10,21 +10,16 @@ pub fn db_delete_review(
 
     let pooled = &mut state.db_pool.get().unwrap();
 
-    match pooled.transaction(move |c| diesel::delete(reviews.filter(id.eq(review_id))).execute(c)) {
-        Ok(affected_count) => {
-            if affected_count > 0 {
-                return Ok(None);
-            } else {
-                return Err((
-                    Status::NotFound,
-                    Some(String::from("Review could not be found")),
-                ));
-            }
-        }
-        Err(err) => match err {
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
+    let affected_count = pooled
+        .transaction(move |c| diesel::delete(reviews.filter(id.eq(review_id))).execute(c))
+        .expect("Database error");
+
+    if affected_count > 0 {
+        Ok(None)
+    } else {
+        Err((
+            Status::NotFound,
+            Some(String::from("Review could not be found")),
+        ))
     }
 }

@@ -17,20 +17,12 @@ pub fn db_update_review_status(
             .set(approved.eq(status))
             .get_result::<Review>(c)
     }) {
-        Ok(review) => {
-            return Ok(review);
-        }
-        Err(err) => match err {
-            diesel::result::Error::NotFound => {
-                return Err((
-                    Status::NotFound,
-                    Some(format!("The review with ID {} not found", review_id)),
-                ));
-            }
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
+        Ok(review) => Ok(review),
+        Err(diesel::result::Error::NotFound) => Err((
+            Status::NotFound,
+            Some(format!("The review with ID {} not found", review_id)),
+        )),
+        Err(err) => panic!("Database error - {}", err),
     }
 }
 
@@ -49,16 +41,10 @@ pub fn db_update_review(
             .get_result::<Review>(c)
     }) {
         Ok(review) => Ok(review),
-        Err(err) => match err {
-            diesel::result::Error::NotFound => {
-                return Err((
-                    Status::NotFound,
-                    Some(format!("The review with ID {} not found", review_id)),
-                ));
-            }
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
+        Err(diesel::result::Error::NotFound) => Err((
+            Status::NotFound,
+            Some(format!("The review with ID {} not found", review_id)),
+        )),
+        Err(err) => panic!("Database error - {}", err),
     }
 }

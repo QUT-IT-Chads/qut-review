@@ -9,8 +9,5 @@ pub fn login_user(
 ) -> Result<String, (Status, Option<String>)> {
     let user = db_login_request(&user.email, &user.hashed_password, state)?;
 
-    match create_jwt(user.id, user.role) {
-        Ok(token) => Ok(token),
-        Err(err) => panic!("Error: Failed to create token for user - {}", err),
-    }
+    Ok(create_jwt(user.id, user.role).expect("Error: Failed to create token for user"))
 }

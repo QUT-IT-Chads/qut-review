@@ -26,24 +26,19 @@ pub fn user_exists(
 ) -> Result<bool, (Status, Json<ResponseMessage>)> {
     use domain::schema::users;
 
-    match pooled.transaction(move |c| {
-        users::table
-            .select(users::all_columns)
-            .filter(users::email.eq(&user_email))
-            .count()
-            .load::<i64>(c)
-    }) {
-        Ok(user_count) => {
-            if user_count[0] == 0 {
-                return Ok(false);
-            }
+    let user_count = pooled
+        .transaction(move |c| {
+            users::table
+                .select(users::all_columns)
+                .filter(users::email.eq(&user_email))
+                .count()
+                .load::<i64>(c)
+        })
+        .expect("Database error");
 
-            Ok(true)
-        }
-        Err(err) => match err {
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
+    if user_count[0] == 0 {
+        return Ok(false);
     }
+
+    Ok(true)
 }

@@ -13,20 +13,12 @@ pub fn db_read_user(
     let pooled = &mut state.db_pool.get().unwrap();
 
     match pooled.transaction(move |c| users::table.find(user_id).first::<User>(c)) {
-        Ok(user) => {
-            return Ok(user.get_public());
-        }
-        Err(err) => match err {
-            diesel::result::Error::NotFound => {
-                return Err((
-                    Status::NotFound,
-                    Some(String::from("User could not be found.")),
-                ));
-            }
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
+        Ok(user) => Ok(user.get_public()),
+        Err(diesel::result::Error::NotFound) => Err((
+            Status::NotFound,
+            Some(String::from("User could not be found.")),
+        )),
+        Err(err) => panic!("Database error - {}", err),
     }
 }
 
@@ -47,17 +39,11 @@ pub fn db_login_request(
             .first::<User>(c)
     }) {
         Ok(user) => Ok(user.get_public()),
-        Err(err) => match err {
-            diesel::result::Error::NotFound => {
-                return Err((
-                    Status::Unauthorized,
-                    Some(String::from("Invalid credentials")),
-                ));
-            }
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
+        Err(diesel::result::Error::NotFound) => Err((
+            Status::Unauthorized,
+            Some(String::from("Invalid credentials")),
+        )),
+        Err(err) => panic!("Database error - {}", err),
     }
 }
 
@@ -69,24 +55,15 @@ pub fn db_does_user_exist(
 
     let pooled = &mut state.db_pool.get().unwrap();
 
-    match pooled.transaction(move |c| {
-        users::table
-            .select(users::all_columns)
-            .filter(users::email.eq(&user_email))
-            .count()
-            .load::<i64>(c)
-    }) {
-        Ok(user_count) => {
-            if user_count[0] == 0 {
-                return Ok(false);
-            }
+    let user_count = pooled
+        .transaction(move |c| {
+            users::table
+                .select(users::all_columns)
+                .filter(users::email.eq(&user_email))
+                .count()
+                .load::<i64>(c)
+        })
+        .expect("Database error");
 
-            Ok(true)
-        }
-        Err(err) => match err {
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
-    }
+    Ok(user_count[0] != 0)
 }

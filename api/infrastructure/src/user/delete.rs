@@ -11,20 +11,13 @@ pub fn db_delete_user(
 
     let pooled = &mut state.db_pool.get().unwrap();
 
-    match pooled
+    let affected_count = pooled
         .transaction(move |c| diesel::delete(users.filter(db_user_id.eq(user_id))).execute(c))
-    {
-        Ok(affected_count) => {
-            if affected_count > 0 {
-                return Ok(None);
-            } else {
-                return Err((Status::NotFound, Some(String::from("User not found"))));
-            }
-        }
-        Err(err) => match err {
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
+        .expect("Database error");
+
+    if affected_count > 0 {
+        Ok(None)
+    } else {
+        Err((Status::NotFound, Some(String::from("User not found"))))
     }
 }

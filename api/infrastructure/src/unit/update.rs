@@ -18,16 +18,10 @@ pub fn db_update_unit(
             .get_result::<Unit>(c)
     }) {
         Ok(unit) => Ok(unit),
-        Err(err) => match err {
-            diesel::result::Error::NotFound => {
-                return Err((
-                    Status::NotFound,
-                    Some(format!("The unit {} could not be found", unit_code)),
-                ));
-            }
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
+        Err(diesel::result::Error::NotFound) => Err((
+            Status::NotFound,
+            Some(format!("The unit {} could not be found", unit_code)),
+        )),
+        Err(err) => panic!("Database error - {}", err),
     }
 }

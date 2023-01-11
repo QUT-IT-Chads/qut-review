@@ -13,14 +13,9 @@ pub fn create_unit(
 ) -> Result<Unit, (Status, Option<String>)> {
     has_admin_permissions(&token)?;
 
-    match db_does_unit_exist(&unit.unit_code, &state) {
-        Ok(exists) => {
-            if exists {
-                return Err((Status::Conflict, Some(String::from("Unit already exist."))));
-            }
-        }
-        Err(err) => return Err(err),
-    };
+    if db_does_unit_exist(&unit.unit_code, state)? {
+        return Err((Status::Conflict, Some(String::from("Unit already exist."))));
+    }
 
-    db_insert_unit(unit, &state)
+    db_insert_unit(unit, state)
 }
