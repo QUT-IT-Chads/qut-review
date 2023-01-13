@@ -26,7 +26,7 @@ impl User {
     }
 
     /// Returns a version of the User struct which can be publically exposed
-    pub fn get_public(self: &Self) -> GetUser {
+    pub fn get_public(&self) -> GetUser {
         GetUser {
             id: self.id,
             email: self.email.clone(),

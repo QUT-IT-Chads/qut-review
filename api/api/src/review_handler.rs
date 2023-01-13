@@ -12,6 +12,8 @@ use rocket::{delete, get, post, put, State};
 use rocket_okapi::settings::OpenApiSettings;
 use rocket_okapi::{openapi, openapi_get_routes_spec};
 
+use crate::{convert_err, convert_result};
+
 pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi) {
     openapi_get_routes_spec![
         settings: list_review_handler,
@@ -35,13 +37,7 @@ pub fn list_reviews_handler(
 ) -> Result<Json<Vec<Review>>, (Status, Json<ResponseMessage>)> {
     let state = state.inner();
 
-    match read::list_reviews(_page, _limit, state) {
-        Ok(reviews) => Ok(Json(reviews)),
-        Err(err) => {
-            let response = ResponseMessage { message: err.1 };
-            Err((err.0, Json(response)))
-        }
-    }
+    convert_result(read::list_reviews(_page, _limit, state))
 }
 
 /// Get a list of all reviews sorted by unit code
@@ -55,13 +51,7 @@ pub fn list_unit_reviews_handler(
 ) -> Result<Json<Vec<Review>>, (Status, Json<ResponseMessage>)> {
     let state = state.inner();
 
-    match read::list_unit_reviews(unit_code, _page, _limit, state) {
-        Ok(reviews) => Ok(Json(reviews)),
-        Err(err) => {
-            let response = ResponseMessage { message: err.1 };
-            Err((err.0, Json(response)))
-        }
-    }
+    convert_result(read::list_unit_reviews(unit_code, _page, _limit, state))
 }
 
 /// Get a review by ID
@@ -73,13 +63,7 @@ pub fn list_review_handler(
 ) -> Result<Json<Review>, (Status, Json<ResponseMessage>)> {
     let state = state.inner();
 
-    match read::list_review(review_id, state) {
-        Ok(review) => Ok(Json(review)),
-        Err(err) => {
-            let response = ResponseMessage { message: err.1 };
-            Err((err.0, Json(response)))
-        }
-    }
+    convert_result(read::list_review(review_id, state))
 }
 
 /// Get all reviews by a user
@@ -91,13 +75,7 @@ pub fn list_user_reviews_handler(
 ) -> Result<Json<Vec<Review>>, (Status, Json<ResponseMessage>)> {
     let state = state.inner();
 
-    match read::list_user_reviews(user_id, state) {
-        Ok(reviews) => Ok(Json(reviews)),
-        Err(err) => {
-            let response = ResponseMessage { message: err.1 };
-            Err((err.0, Json(response)))
-        }
-    }
+    convert_result(read::list_user_reviews(user_id, state))
 }
 
 /// Create a new review
@@ -111,15 +89,13 @@ pub fn create_review_handler(
     let token = token?;
     let state = state.inner();
 
-    match create::create_review(review.into_inner(), state, token) {
-        Ok(review) => Ok(Created::new("").tagged_body(
-            serde_json::to_string(&review).expect("Return 500 internal server error."),
-        )),
-        Err(err) => {
-            let response = ResponseMessage { message: err.1 };
-            Err((err.0, Json(response)))
-        }
-    }
+    create::create_review(review.into_inner(), state, token)
+        .map(|review| {
+            Created::new("").tagged_body(
+                serde_json::to_string(&review).expect("Return 500 internal server error."),
+            )
+        })
+        .map_err(convert_err)
 }
 
 /// Approve or disapprove a review
@@ -134,13 +110,12 @@ pub fn approve_review_handler(
     let token = token?;
     let state = state.inner();
 
-    match update::approve_review(review_id, status.unwrap_or(true), state, token) {
-        Ok(review) => Ok(Json(review)),
-        Err(err) => {
-            let response = ResponseMessage { message: err.1 };
-            Err((err.0, Json(response)))
-        }
-    }
+    convert_result(update::approve_review(
+        review_id,
+        status.unwrap_or(true),
+        state,
+        token,
+    ))
 }
 
 /// Delete a review
@@ -154,16 +129,9 @@ pub fn delete_review_handler(
     let token = token?;
     let state = state.inner();
 
-    match delete::delete_review(review_id, state, token) {
-        Ok(message) => {
-            let response = ResponseMessage { message };
-            Ok(Json(response))
-        }
-        Err(err) => {
-            let response = ResponseMessage { message: err.1 };
-            Err((err.0, Json(response)))
-        }
-    }
+    delete::delete_review(review_id, state, token)
+        .map(|message| Json(ResponseMessage { message }))
+        .map_err(convert_err)
 }
 
 /// Update a review
@@ -180,12 +148,10 @@ pub fn update_review_handler(
 
     let review = review.into_inner();
 
-    match update::update_review(review_id, review, state, token) {
-        Ok(review) => Ok(Created::new("")
-            .tagged_body(serde_json::to_string(&review).expect("500 internal server error"))),
-        Err(err) => {
-            let response = ResponseMessage { message: err.1 };
-            Err((err.0, Json(response)))
-        }
-    }
+    update::update_review(review_id, review, state, token)
+        .map(|review| {
+            Created::new("")
+                .tagged_body(serde_json::to_string(&review).expect("500 internal server error"))
+        })
+        .map_err(convert_err)
 }

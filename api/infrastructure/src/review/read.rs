@@ -1,4 +1,4 @@
-use crate::{review, ServerState};
+use crate::ServerState;
 use diesel::prelude::*;
 use domain::models::review::Review;
 use rocket::http::Status;
@@ -19,21 +19,11 @@ pub fn db_does_unit_exist(
             .count()
             .load::<i64>(c)
     }) {
-        Ok(unit_count) => {
-            if unit_count[0] == 0 {
-                return Ok(false);
-            }
-
-            Ok(true)
+        Ok(unit_count) => Ok(unit_count[0] != 0),
+        Err(diesel::result::Error::NotFound) => {
+            Err((Status::NotFound, Some(String::from("Unit does not exist."))))
         }
-        Err(err) => match err {
-            diesel::result::Error::NotFound => {
-                return Err((Status::NotFound, Some(String::from("Unit does not exist."))));
-            }
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
+        Err(err) => panic!("Database error - {}", err),
     }
 }
 

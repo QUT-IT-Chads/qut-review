@@ -12,6 +12,8 @@ use rocket::{delete, get, post, State};
 use rocket_okapi::settings::OpenApiSettings;
 use rocket_okapi::{openapi, openapi_get_routes_spec};
 
+use crate::{convert_err, convert_result};
+
 pub fn get_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi) {
     openapi_get_routes_spec![
         settings: create_user_handler,
@@ -32,14 +34,13 @@ pub fn create_user_handler(
     let user = user.into_inner();
     let state = state.inner();
 
-    match create::create_user(user, state) {
-        Ok(user) => Ok(Created::new("")
-            .tagged_body(serde_json::to_string(&user).expect("Return 500 internal server error."))),
-        Err(err) => {
-            let response = ResponseMessage { message: err.1 };
-            Err((err.0, Json(response)))
-        }
-    }
+    create::create_user(user, state)
+        .map(|user| {
+            Created::new("").tagged_body(
+                serde_json::to_string(&user).expect("Return 500 internal server error."),
+            )
+        })
+        .map_err(convert_err)
 }
 
 /// Get a user by id
@@ -53,13 +54,7 @@ pub fn list_user_handler(
     let token = token?;
     let state = state.inner();
 
-    match read::list_user(user_id, state, token) {
-        Ok(user) => Ok(Json(user)),
-        Err(err) => {
-            let response = ResponseMessage { message: err.1 };
-            Err((err.0, Json(response)))
-        }
-    }
+    convert_result(read::list_user(user_id, state, token))
 }
 
 /// Delete a user
@@ -73,16 +68,9 @@ pub fn delete_user_handler(
     let token = token?;
     let state = state.inner();
 
-    match delete::delete_user(user_id, state, token) {
-        Ok(message) => {
-            let response = ResponseMessage { message };
-            Ok(Json(response))
-        }
-        Err(err) => {
-            let response = ResponseMessage { message: err.1 };
-            Err((err.0, Json(response)))
-        }
-    }
+    delete::delete_user(user_id, state, token)
+        .map(|message| Json(ResponseMessage { message }))
+        .map_err(convert_err)
 }
 
 /// Update a user
@@ -98,14 +86,13 @@ pub fn update_user_handler(
     let state = state.inner();
     let user = user.into_inner();
 
-    match update::update_user(user_id, user, state, token) {
-        Ok(user) => Ok(Created::new("")
-            .tagged_body(serde_json::to_string(&user).expect("Return 500 internal server error."))),
-        Err(err) => {
-            let response = ResponseMessage { message: err.1 };
-            Err((err.0, Json(response)))
-        }
-    }
+    update::update_user(user_id, user, state, token)
+        .map(|user| {
+            Created::new("").tagged_body(
+                serde_json::to_string(&user).expect("Return 500 internal server error."),
+            )
+        })
+        .map_err(convert_err)
 }
 
 /// Login as a user
@@ -118,14 +105,7 @@ pub fn login_user_handler(
     let user = user.into_inner();
     let state = state.inner();
 
-    match login::login_user(user, state) {
-        Ok(token) => {
-            let response = AuthToken { token };
-            Ok(Json(response))
-        }
-        Err(err) => {
-            let response = ResponseMessage { message: err.1 };
-            Err((err.0, Json(response)))
-        }
-    }
+    login::login_user(user, state)
+        .map(|token| Json(AuthToken { token }))
+        .map_err(convert_err)
 }
