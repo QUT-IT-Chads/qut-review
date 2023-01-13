@@ -7,7 +7,6 @@ use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome, Request};
 use rocket::serde::json::Json;
 use rocket::serde::{Deserialize, Serialize};
-use rocket::Responder;
 use rocket_okapi::gen::OpenApiGenerator;
 use rocket_okapi::request::{OpenApiFromRequest, RequestHeaderInput};
 use schemars::JsonSchema;
@@ -15,24 +14,6 @@ use std::env;
 use uuid::Uuid;
 
 use crate::response_models::ResponseMessage;
-
-#[derive(Responder, Serialize, Deserialize, Debug, JsonSchema)]
-pub enum NetworkResponse {
-    #[response(status = 201)]
-    Created(String),
-    #[response(status = 400)]
-    BadRequest(String),
-    #[response(status = 401)]
-    Unauthorized(String),
-    #[response(status = 404)]
-    NotFound(String),
-    #[response(status = 409)]
-    Conflict(String),
-    #[response(status = 498)]
-    InvalidToken(Option<String>),
-    #[response(status = 498)]
-    ExpiredSignature(Option<String>),
-}
 
 #[derive(Debug, Deserialize, Serialize, JsonSchema)]
 pub struct Claims {
@@ -60,7 +41,9 @@ impl<'r> FromRequest<'r> for JWT {
                 Status::Unauthorized,
                 (
                     Status::Unauthorized,
-                    Json(ResponseMessage { message: Some(String::from("No token provided.")) }),
+                    Json(ResponseMessage {
+                        message: Some(String::from("No token provided.")),
+                    }),
                 ),
             )),
             Some(key) => match is_valid(key) {
@@ -121,7 +104,7 @@ fn decode_jwt(token: String) -> Result<Claims, ErrorKind> {
     let token = token.trim_start_matches("Bearer").trim();
 
     match decode::<Claims>(
-        &token,
+        token,
         &DecodingKey::from_secret(secret.as_bytes()),
         &Validation::new(Algorithm::HS512),
     ) {

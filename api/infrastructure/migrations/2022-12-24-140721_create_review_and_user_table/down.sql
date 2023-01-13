@@ -3,3 +3,4 @@ DROP TABLE reviews;
 DROP TABLE users;
 DROP TABLE units;
 DROP TYPE semester;
+DROP TYPE role;

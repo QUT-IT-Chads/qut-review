@@ -23,7 +23,7 @@ fn main() {
     ]);
 
     for (file_name, data_type) in data_types {
-        if let Err(err) = write_schema(&dir, file_name, &data_type) {
+        if let Err(err) = write_schema(dir, file_name, &data_type) {
             panic!("Error creating schema for type {} - {}", file_name, err);
         };
     };

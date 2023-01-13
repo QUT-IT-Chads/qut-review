@@ -1,48 +1,44 @@
-use diesel::prelude::*;
-use domain::{
-    enums::role::Role,
-    models::user::{GetUser, User},
+use crate::{response_models::ResponseMessage, token::JWT};
+use diesel::{
+    prelude::*,
+    r2d2::{ConnectionManager, PooledConnection},
 };
-use infrastructure::ServerState;
-use rocket::{http::Status, serde::json::Json, State};
-use shared::{response_models::ResponseMessage, token::JWT};
+use domain::models::user::GetUser;
+use infrastructure::{user::read::db_read_user, ServerState};
+use rocket::{http::Status, serde::json::Json};
 use uuid::Uuid;
+
+use crate::auth::has_user_permissions;
 
 pub fn list_user(
     user_id: Uuid,
-    state: &State<ServerState>,
+    state: &ServerState,
     token: JWT,
-) -> Result<Json<GetUser>, (Status, Json<ResponseMessage>)> {
+) -> Result<GetUser, (Status, Option<String>)> {
+    has_user_permissions(&token, &user_id)?;
+
+    db_read_user(&user_id, state)
+}
+
+pub fn user_exists(
+    user_email: &String,
+    pooled: &mut PooledConnection<ConnectionManager<PgConnection>>,
+) -> Result<bool, (Status, Json<ResponseMessage>)> {
     use domain::schema::users;
 
-    if token.claims.sub != user_id && token.claims.role != Role::Admin {
-        let response = ResponseMessage {
-            message: Some(String::from(
-                "You do not have access to perform this action.",
-            )),
-        };
+    let user_count = pooled
+        .transaction(move |c| {
+            users::table
+                .select(users::all_columns)
+                .filter(users::email.eq(&user_email))
+                .count()
+                .load::<i64>(c)
+        })
+        .expect("Database error");
 
-        return Err((Status::Unauthorized, Json(response)));
+    if user_count[0] == 0 {
+        return Ok(false);
     }
 
-    let pooled = &mut state.db_pool.get().unwrap();
-
-    match pooled.transaction(move |c| users::table.find(user_id).first::<User>(c)) {
-        Ok(user) => {
-            // Converting User to GetUser which removes password
-            return Ok(Json(user.into()));
-        }
-        Err(err) => match err {
-            diesel::result::Error::NotFound => {
-                let response = ResponseMessage {
-                    message: Some(String::from("User could not be found.")),
-                };
-
-                return Err((Status::NotFound, Json(response)));
-            }
-            _ => {
-                panic!("Database error - {}", err);
-            }
-        },
-    }
+    Ok(true)
 }

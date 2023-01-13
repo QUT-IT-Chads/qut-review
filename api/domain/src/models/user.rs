@@ -9,13 +9,33 @@ use serde::{Deserialize, Serialize};
 #[derive(Insertable, Queryable, Deserialize, Serialize, JsonSchema, AsChangeset)]
 #[diesel(table_name = users)]
 pub struct User {
-    pub id: Uuid,
-    pub email: String,
+    id: Uuid,
+    email: String,
     hashed_password: String,
-    pub role: Role,
+    role: Role,
 }
 
-/// Use this structure when returning a user to the frontend
+impl User {
+    pub fn new(id: Uuid, user: UpdateUser) -> Self {
+        User {
+            id,
+            email: user.email,
+            hashed_password: user.hashed_password,
+            role: user.role,
+        }
+    }
+
+    /// Returns a version of the User struct which can be publically exposed
+    pub fn get_public(&self) -> GetUser {
+        GetUser {
+            id: self.id,
+            email: self.email.clone(),
+            role: self.role.clone(),
+        }
+    }
+}
+
+/// A struct to handle a user type which can be publically exposed
 #[derive(Insertable, Queryable, Deserialize, Serialize, JsonSchema, AsChangeset)]
 #[diesel(table_name = users)]
 pub struct GetUser {
@@ -24,26 +44,16 @@ pub struct GetUser {
     pub role: Role,
 }
 
-impl From<User> for GetUser {
-    fn from(user: User) -> Self {
-        GetUser {
-            id: user.id,
-            email: user.email,
-            role: user.role,
-        }
-    }
-}
-
-
-
+/// A struct to handle updating a user
 #[derive(Insertable, Queryable, Deserialize, Serialize, JsonSchema, AsChangeset)]
 #[diesel(table_name = users)]
-pub struct NewUser {
+pub struct UpdateUser {
     pub email: String,
     pub hashed_password: String,
     pub role: Role,
 }
 
+/// A struct to handle a users login request
 #[derive(Insertable, Queryable, Deserialize, Serialize, JsonSchema, AsChangeset)]
 #[diesel(table_name = users)]
 pub struct LoginRequest {
@@ -51,23 +61,20 @@ pub struct LoginRequest {
     pub hashed_password: String,
 }
 
-impl From<LoginRequest> for NewUser {
+/// A struct to handle the creation of a new user
+#[derive(Insertable, Queryable, Deserialize, Serialize, JsonSchema, AsChangeset)]
+#[diesel(table_name = users)]
+pub struct NewUser {
+    pub email: String,
+    pub hashed_password: String,
+}
+
+impl From<LoginRequest> for UpdateUser {
     fn from(user: LoginRequest) -> Self {
-        NewUser {
+        UpdateUser {
             email: user.email,
             hashed_password: user.hashed_password,
             role: Role::User,
-        }
-    }
-}
-
-impl User {
-    pub fn new(id: Uuid, new_user: NewUser) -> Self {
-        User {
-            id,
-            email: new_user.email,
-            hashed_password: new_user.hashed_password,
-            role: new_user.role,
         }
     }
 }
